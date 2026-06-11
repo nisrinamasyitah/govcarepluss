@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return isAuth() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // ── users/{userId} ─────────────────────────────────────────────────────────
+    // Citizens can read/write their own document.
+    // Admins can read any user document.
+    // Nobody — including the owner — may write a plaintext password field.
+    match /users/{userId} {
+      allow read:   if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+                    && !('password' in request.resource.data);
+      allow update: if isOwner(userId)
+                    && !('password' in request.resource.data);
+      allow delete: if false;
+    }
+
+    // ── complaints/{complaintId} ───────────────────────────────────────────────
+    // Citizens can create a complaint.
+    // citizenEmail is stored AES-256-GCM encrypted so identity is verified via
+    // citizenId (the Firebase Auth UID) instead of comparing email strings.
+    // Citizens can read only their own complaints.
+    // Only admins can update status/adminNotes or delete a complaint.
+    match /complaints/{complaintId} {
+      allow create: if isAuth()
+                    && request.resource.data.citizenId == request.auth.uid;
+      allow read:   if isAuth()
+                    && (resource.data.citizenId == request.auth.uid || isAdmin());
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys()
+                         .hasOnly(['status', 'adminNotes', 'updatedAt']);
+      allow delete: if isAdmin();
+    }
+
+    // ── admins/{adminId} ───────────────────────────────────────────────────────
+    // Admins can read their own admin document (used for role check).
+    // No client-side writes ever — admin records are managed via Firebase console
+    // or server-side Admin SDK only.
+    match /admins/{adminId} {
+      allow read:  if isOwner(adminId);
+      allow write: if false;
+    }
+
+    // ── activityLogs/{logId} ──────────────────────────────────────────────────
+    // Any authenticated user can append a log entry for themselves.
+    // Users can read their own logs; admins can read all.
+    // Logs are immutable once written.
+    match /activityLogs/{logId} {
+      allow create: if isAuth()
+                    && request.resource.data.userId == request.auth.uid;
+      allow read:   if isAuth()
+                    && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if false;
+    }
+
+    // ── faq/{faqId} ───────────────────────────────────────────────────────────
+    // Anyone can read FAQ entries (public content).
+    // Only admins can create, update, or delete FAQ entries.
+    match /faq/{faqId} {
+      allow read:   if true;
+      allow write:  if isAdmin();
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

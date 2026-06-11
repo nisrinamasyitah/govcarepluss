@@ -1,0 +1,698 @@
+
+═════════════════════════════════════════  GOVCARE+  ·  LIVE ENCRYPTION DATA REPORT  ·  REAL FIREBASE DATA  ══════════════════════════════════════════
+  Generated    : 21/05/2026, 2:24:26 am  (Asia/Kuala_Lumpur)
+  Firebase     : govcarepluss.firebaseapp.com
+  Algorithm    : AES-256-GCM  |  Key derivation : PBKDF2-SHA256  (100,000 iterations)
+  Integrity    : HMAC-SHA256 signature per complaint
+  Records      : 3 users  ·  11 complaints  ·  20 activity logs
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  LEGEND
+  ────────────────────────────────────────────────────────────────────────────────
+  [ENC]  PII field — PLAIN TEXT column shows the real value; FIRESTORE column shows the
+         AES-256-GCM ciphertext as stored (or what it would look like for older records
+         written before encryption was enabled). A database breach only exposes ciphertext.
+         Fields without [ENC] are non-sensitive metadata (IDs, status, timestamps).
+
+═══════════════════════════════════════════════════  COLLECTION : users  (3 registered accounts)  ════════════════════════════════════════════════════
+
+  User 1 of 3  —  UID: A1yERjYnZmUfmNadLeCGWTLVFWB2
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ fullName           │ AHMAD AYDIN BIN MOHD SOFFI                                     │ [ENC]                                                          │
+│                    │                                                                │ enc:6AWEK5AytdCi7W4zK7EPDD6JKzg8sVrKlJOrr3e1FFAjmRJhQDmk0sWG1k │
+│                    │                                                                │ d9ptBY7HCfwUZR                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ email              │ mecimasyi@gmail.com                                            │ [ENC]                                                          │
+│                    │                                                                │ enc:toBAwZP4kiF1drz7hXxJklrgQTZqv+AMheuh6E8suuZWWfR+vduW9XFXx4 │
+│                    │                                                                │ Ib6Lc=                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ phone              │ 01125618247                                                    │ [ENC] enc:7i46z1FCzCqGrMagb/qjtLdlRyBsgtESBxFZ90LU1uSwsrxAUJyR │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ icNumber           │ 010425-06-0981                                                 │ [ENC]                                                          │
+│                    │                                                                │ enc:bI12OaPL+gOnMwdwSKMcfPjpzHq24ivoGEYS0MOUbD7DJB6J8G9nz4UU   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ password           │ Aydin01@                                                       │ [ENC] enc:9Drr2XPLSMcNvFK30Sck/IeTt0wFOYER4zfgv5fUelYPMW6o     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifEmail         │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifSms           │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ createdAt          │ 2026-03-01T04:54:23.777Z                                       │ 2026-03-01T04:54:23.777Z                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  User 2 of 3  —  UID: Gql6NZInGUMGitFEhyViVtpyuR63
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ fullName           │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:FShyyNOruCLMc1UaI09LWJu+OoHW2CXKt2SF8D7Wl1WSVG+wNK+5XTMo4G │
+│                    │                                                                │ tRNJ9kcf6v+loXwXPfilzfDfkoyGY=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ email              │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:FdhauTM2o8+uglXGUCBOMM/XNfiBSrNbz9iUeb0+Rs6G0vuU8nmhG8ZzHC │
+│                    │                                                                │ Dh9UZNNiOgUlo=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ phone              │ 01125618247                                                    │ [ENC] enc:zxTqh9hw9NLMTvRqx4e+gaaeeO50z1aOw16P+4M4wbwo7F8DXCaY │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ icNumber           │ 040901-10-2036                                                 │ [ENC]                                                          │
+│                    │                                                                │ enc:BdO7jtsF+p/SOE+0VkKfi8P30Xnw5Q0fFSztKIofI9QIQHDpckBcyXfJ   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ password           │ Masyi01@                                                       │ [ENC] enc:UVpjA4CIyRpza9fzfv/Y5Jt1qnb4kFkebveqDWuhLm4vz+y3     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifEmail         │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifSms           │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ createdAt          │ 2026-03-01T04:36:06.142Z                                       │ 2026-03-01T04:36:06.142Z                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  User 3 of 3  —  UID: KGQod3HeSpWHOSd3Y3E3lLOvLQ92
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ fullName           │ DAMIA ALYSSA                                                   │ [ENC]                                                          │
+│                    │                                                                │ enc:WaMg4SNIGjU8uICA8mdExVDIYz8DcHpfOoJV3sUY5NrGyXrhWDHEZQ==   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ email              │ damiaalyssa1004@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:1DF0hGpYgbQyxZkF2sfeWObMmAe3CoSdVmAdABRRefynC0vaK0N5IbBLmE │
+│                    │                                                                │ /bEKd+o2oRDJU=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ phone              │ +60126957989                                                   │ [ENC]                                                          │
+│                    │                                                                │ enc:XbV9arDucvGahrxpnEcC/4pEEhumsHOnUCmKnbclk+WR9rcv8UZnvg==   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ icNumber           │ 041020-14-1566                                                 │ [ENC]                                                          │
+│                    │                                                                │ enc:eij8R04JSdOpujvli0Ne4AScQOITOsWROtHsH1a/rwilZ/NA2avY2Osg   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ password           │ meowmeowmeoW2?                                                 │ [ENC]                                                          │
+│                    │                                                                │ enc:HvvL/7/TIblN7+9womZlNCQxz+UDVeB3YzYvHRNVejXLQCgh79yz5wpY   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifEmail         │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ notifSms           │ true                                                           │ true                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ createdAt          │ 2026-05-19T05:12:27.364Z                                       │ 2026-05-19T05:12:27.364Z                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+═════════════════════════════════════════════════════  COLLECTION : complaints  (11 submitted)  ══════════════════════════════════════════════════════
+
+  Complaint 1 of 11  —  ID: T-2026-0005
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ T-2026-0005                                                    │ T-2026-0005                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:iOlJ3jCEvmITlTx0kwUkqeF9w7oDnmn0JKViiTpcaXQEXk8UFmrU06gc75 │
+│                    │                                                                │ jpW+ILlMKpkQIX3f44jrOS4Qn+H2M=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:TNdXT+gsWNTJHrNc/u4dZUv2QuQ0v8+DDnUIn3P9jesJs4dKOz/5Nmfx/b │
+│                    │                                                                │ nsN4cDiF5bAds=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Collapsed Road Section Creating Immediate Danger               │ [ENC]                                                          │
+│                    │                                                                │ enc:HXZuDhRcJOvX/EFpc1vi4DuM2auo5tIlFtmIinuRxf5MQ6ZI49cAL/8CYV │
+│                    │                                                                │ 1x6ej43HKeykcflGzY0ArcB8TlHEtmIbnRAvMad7ExVw==                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ A section of the main road has partially collapsed, creating a │ [ENC]                                                          │
+│                    │ large hole that poses a serious danger to drivers and          │ enc:5usnS9ce6bCzy7NjfgHB4/n4eZSxG3k++JQyz7rjwVkkWNu8a+WU1q2B0M │
+│                    │ motorcyclists. Several vehicles were forced to suddenly change │ wlmUcUyuPKhALoc/iLFbB2ierRxBdAOP/krLIjehGrawF+HUyFUXaL7BeKxYEw │
+│                    │ lanes to avoid the hazard, increasing accident risk. Immediate │ d8p2v0NClc28dO/eSSMjQEq3qOny/YuPUqtfDZGjaqFjwTam35aiq+LUtBzsvE │
+│                    │ repair and traffic control measures are urgently required.     │ zLDTxg6UDntnS+kWhmR7xnOG1SMLIeBK7oHN/i1vykWZMVOnbnR93Z5ld9p034 │
+│                    │                                                                │ Yw8+QKvvbcEuYYUIsRMA53s7K0xNCWea4bVAF5kxNkkZE9T6MEdyCqzC9Peje5 │
+│                    │                                                                │ q1DX0UjsFnGRlLESNv0CB9V6Nu5HzH1JmAvrujJLjXKZhzry4shcyHF9b58pm9 │
+│                    │                                                                │ H0wnxpYOXfIseA0vS2cPG1lDKEovd+hRwgBoG7e/IPFVf9ibcMvXTeJ47/URzL │
+│                    │                                                                │ 2qEdSKUhI=                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Transport                                                      │ Transport                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ High                                                           │ High                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Rejected                                                       │ Rejected                                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ this is duplicate complaint . we already get this complaint .  │ this is duplicate complaint . we already get this complaint .  │
+│                    │ we will solve this problem soon . be patient and thank you .   │ we will solve this problem soon . be patient and thank you .   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 2 of 11  —  ID: HA-2026-0003
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ HA-2026-0003                                                   │ HA-2026-0003                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:y+5vS0tbNdcYuZqDj54HfMrqVXFRmXtMdlddaPXObCZrP1PGaBNRTncDyq │
+│                    │                                                                │ /0Oss8fw2nNoI2OYVXpzOhSlsXM2Y=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:B5KTOt9YA4glcoH66KqGr+zjFxxXr2rtmJMVEvZj0UWXkK6G/ccASuJc79 │
+│                    │                                                                │ aa3oHBoTYyLUU=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Suggestion to Improve Seating Arrangement at Public Facility   │ [ENC]                                                          │
+│                    │                                                                │ enc:m+/VvNasPnBLf8bHJyLAkYUsTqyF4z/bDfMEVG/AWXt4KMaKkHIRUK4TIh │
+│                    │                                                                │ 9bheXG1k9J212RwiWlAMUClFda+fq2CQs3fHV4cWE8yaqb1lRmUOrRRY6fmQ== │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ The waiting area seating arrangement at a public service       │ [ENC]                                                          │
+│                    │ office could be improved to provide better comfort for         │ enc:FoTqRmjXfckEeS17U7yBFWe2LkHBd81afpWeqBr11J5S+v5LKcuCWXQCS+ │
+│                    │ visitors. While the service functions normally, additional     │ RPn0+pHS+NyBFpwHCH+esGIdeddhue4PW3fE7C3ajnoNPtZT5kS+Etsb9XNzsz │
+│                    │ seating and clearer arrangement would enhance user experience  │ HIZ1E6zhN/iK3KfV3iitjjIoAsVUq8hZb8GictF9Qb+eqem7LA5w5vEOc9ywOW │
+│                    │ and convenience.                                               │ BcB7h9kOCRPL+euzlq+I63ScqKsIMZ/7v7hQmjL9jnepXL4WeTVBSsef9G4gK+ │
+│                    │                                                                │ Zqa/LCvEq0sHexRTBs6EaCPSjkoLAsOre7MV9gIttwkEDFvC3hlahdqQOzfFWX │
+│                    │                                                                │ uTkiBSNxJFCo1fnoys11AyIu2ctWARyib+I9q7hyycaNRL7QeaJ1PViuyb9Hp6 │
+│                    │                                                                │ DQ==                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Home Affairs                                                   │ Home Affairs                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 3 of 11  —  ID: E-2026-0001
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ E-2026-0001                                                    │ E-2026-0001                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:REeWYn9f1tMYohuB8vujyEz/yFCiNZjsWAVDBpJJcelvNHJuFDs11gCfQS │
+│                    │                                                                │ TFVs7+RhoLkx9WTi3V+3f1Q+RQUIA=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:NzEySTuFLIiolgqmlxIVpVYDipomNwBnr9M1SwHhofoYYBQ/wyYf2VmCRl │
+│                    │                                                                │ 9mFEoaxYQ2VNM=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Delay in Processing Student Portal Requests                    │ [ENC]                                                          │
+│                    │                                                                │ enc:Wk1r6XTz6qHGNq7d/PaQHUwC5cmvmWLA9cVaBgI/2DsL1h7eTFUGm7QdgL │
+│                    │                                                                │ Uu1hN7RCoA+XCZ4vM1w5rpwcN04aynMxFDTfw=                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ I submitted an academic request through the online student     │ [ENC]                                                          │
+│                    │ portal more than two weeks ago, but the status remains pending │ enc:8qPcQJNO/ru9iZ8XqYbUWC/OwNHb9CQNcbCqkQnMDguU8G5L4ftwV244Kh │
+│                    │ without any updates. Attempts to contact support have received │ k6p0fYqmBy/c2rzh0FIJ8+oco0ObBaIFg644LWf+jUKtvo7uOF9tPa5nJ6K29C │
+│                    │ delayed responses. This issue affects planning for course      │ JAj/L6TMGAdg0pJFIhkte1pkCLMJ+amgiW7nrNPenWPg6gC/D40pdiCceJTn9x │
+│                    │ registration and academic scheduling. I request faster         │ BjDyjs5D/FGDa17OArnMShEwA+EMTwYpeH96fyCAk7ndl5y/FsMWVW6oZDpd3u │
+│                    │ processing and clearer communication regarding application     │ N4waJGJbwfoaXZBpqeOxnnbHRAqQUqRX3ISr3LNtHxHr4M80UEwA7eI8I/Wsgq │
+│                    │ status.                                                        │ 1Jt6XaPW4m6xoJFjsjrxN9w4uX4f6LSN6N+GQXkR9orKCZVNBdlfZ4z/fVq2ym │
+│                    │                                                                │ uQMj7EM78Ec4lcBYV8eRQ+Cx05afThN6sEe5T3TnpVIDk239AXlIS/NniJdQzc │
+│                    │                                                                │ 1z1O69MExKSXKRG3mv/gJRHGLUHFsudgY54+tO7wjjEi5+yUFmSz4YBDfvyDYE │
+│                    │                                                                │ h6RDoCwzMOWLPhUsKTkp1Goei2pYekY=                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Education                                                      │ Education                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 4 of 11  —  ID: EC-2026-0002
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ EC-2026-0002                                                   │ EC-2026-0002                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ AHMAD AYDIN BIN MOHD SOFFI                                     │ [ENC]                                                          │
+│                    │                                                                │ enc:CCRW4jbWgqihc7+w+G4EMGMnA8Qa4tElE61Ub8FPsivvMAZ+xy7oCvH5QW │
+│                    │                                                                │ pCKya3nuJks7qr                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ mecimasyi@gmail.com                                            │ [ENC]                                                          │
+│                    │                                                                │ enc:a22cRAox7rS7XdJuPDSg7l6HuDOsYM+7rbtlzROzjDjrucoMNoQF0RVTYi │
+│                    │                                                                │ htdt4=                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Air Conditioning Too Cold in Public Office                     │ [ENC]                                                          │
+│                    │                                                                │ enc:3PgGyH3eoscR6Cqtd5PQVJucpeO9lqbSae2qGFXUABMZBVQJNXQ1HM/q2p │
+│                    │                                                                │ s21WJXyMLq36RXdbULB0/DLWutCweuY7SBKw==                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ The air conditioning in a government service office is set at  │ [ENC]                                                          │
+│                    │ a very low temperature, making visitors uncomfortable while    │ enc:qDHgHtBxRw8HJdyW5qfkk7VOgIMS0r8CW7UDBzWq43IOI4zkd/hoYw4dgE │
+│                    │ waiting. Adjusting the temperature settings could improve      │ /012QeAnazLH6GJdYqb6NrR0w6gTv+ed7Cp6FtiYMUp/QCnb1aMcF0WgoJNPFd │
+│                    │ visitor comfort.                                               │ d6Mv8HjLJv4QAJSGVdW6HAkotLA4ocL1T9tGHp8RmveBVEntJRU/5KFql6Vn6+ │
+│                    │                                                                │ anrQoU7MSk/h53Hx+R+txzxeSy+ECwSE8xXkEaOHFH6IKhygEDUOAwEmQaWPet │
+│                    │                                                                │ 0naLz2/6U7E/de5t0H55ixMvhexUL4MjfL3lAD9gS5am0Aj+WaPYzUQ=       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Environment & Cleanliness                                      │ Environment & Cleanliness                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Low                                                            │ Low                                                            │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 5 of 11  —  ID: HA-2026-0002
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ HA-2026-0002                                                   │ HA-2026-0002                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:7Qh70KRtfoyWCuDmTEO1XmoSyJS0Fc7QkLYnFZ9s1nDXspTnO01pGk2VVB │
+│                    │                                                                │ XPWgMdoqG6D2fT8gGEfcsoGPswHXk=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:Ojjqoid7KbwvaZVFuOLSubQ+lhe5lBQ/23huYMy8ZPIjUTOiSsOyzj7B9F │
+│                    │                                                                │ AdQXftk3p+uMs=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Unauthorized Parking Blocking Emergency Access                 │ [ENC]                                                          │
+│                    │                                                                │ enc:vv6YxeJXqw+3lmZWn8j9hwKP7EQ/sE0SpdwHDy8ZuiqAHu8sVM//IWjIXU │
+│                    │                                                                │ WpkQhFqRZE0aL7xwE/aRTA70llAPb9ZRAA0Vqdxq8=                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ Vehicles are frequently parked illegally along emergency       │ [ENC]                                                          │
+│                    │ access routes in a residential area. This obstruction may      │ enc:klZ+QruPvLkIE6ho6GUgbGXHE2joZnU3I/Dg8eNGEyunpVxGFfLucu+1ev │
+│                    │ delay emergency services such as ambulances or fire rescue     │ MRmr9wzp6NLDu4oqfjx0uxSOSVjaKpZ9PRY0DjwZmPPU9bgj+0SThanGYdyT1p │
+│                    │ units. Enforcement action and monitoring are requested to      │ EzqGSgLQlMgYMoE7FpVY/0YWgyx22RergI0LDDjSetbthkd2OAVAyPM+JAaXxt │
+│                    │ ensure public safety.                                          │ CdRUut4aPh9UMhi1kANEm4ZGeUUSMPM63qJlNvXx8OZIJoTf/IzLIKGQQf+b4I │
+│                    │                                                                │ m4uzzfQBqy3IH/bkmoUbI5GL8iXZpvrlxAYPBohty2gMMi0wifLOvR7mm49wPl │
+│                    │                                                                │ HF55VFrNa2nJEVSK4EBw821ig3ee5qv2aFdpJeh8i7WfmYCCiTSQtz4TDNsAnO │
+│                    │                                                                │ HxK6nRs=                                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Home Affairs                                                   │ Home Affairs                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 6 of 11  —  ID: EC-2026-0001
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ EC-2026-0001                                                   │ EC-2026-0001                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ AHMAD AYDIN BIN MOHD SOFFI                                     │ [ENC]                                                          │
+│                    │                                                                │ enc:KJhglgMWYvfmH+fuH5lGFFJNN/rujXbzRkAlmjZMmtjXcPi3tSNloj9i5q │
+│                    │                                                                │ xxwfvg2d2t1Xkd                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ mecimasyi@gmail.com                                            │ [ENC]                                                          │
+│                    │                                                                │ enc:/V4fcFTbt/IBJGtcnQC+2FDtgsKf684X4HY3Zw+lkgA02m1COjSxJCZPOc │
+│                    │                                                                │ 5gfu8=                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Illegal Dumping in Public Open Area                            │ [ENC]                                                          │
+│                    │                                                                │ enc:PexKNx01Bgq/D8l5qA8ogqYmIm0dpIqu55WtKwZYcPtx0zLJZyEUk4uAPB │
+│                    │                                                                │ sKGlhVZRzU6BUhbcHYIBZrhCrG                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ Unauthorized dumping of household waste has been observed in   │ [ENC]                                                          │
+│                    │ an open public space. The waste accumulation causes unpleasant │ enc:1xRF+NmoAHqOXRrw8DFaqrCLECqLMStwMFkGBfmIcPCOVdKxqwDvEGcvWo │
+│                    │ odors and attracts pests, affecting environmental cleanliness. │ K7Skf6xaxIn6cyKk8q7nqzVtxut/gixL8xwiEjQD0+GeEHzZwNnl+CZERgU5pe │
+│                    │ Investigation and stricter enforcement are requested.          │ BKnVqxQ81pwDkhLCTSf8sRV4sVY35VtHhrtt3yE9yp0WLXDGpBRi607YZC5fmk │
+│                    │                                                                │ /FlswUGGsXvpKQJ4oFQbXJFmYpshrOJaV0JaXan01PAFjiER63GyTkq3JP7Eos │
+│                    │                                                                │ udhEUnsh7KH902jRMpEDQm+un/ogZKUt2GwO+M1kw30tAIKKe9XE05J3IWR5Sv │
+│                    │                                                                │ ViEq4tMIml0tGiCqLdmOjxybhl2mjeB7LGUNAAQEQguig67wJf7Q==         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Environment & Cleanliness                                      │ Environment & Cleanliness                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Pending Review                                                 │ Pending Review                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 7 of 11  —  ID: HA-2026-0001
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ HA-2026-0001                                                   │ HA-2026-0001                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:eHvM0BUdSCAjl4WhBBv9YTFn6J7FRoFBaKEfRxiGQeC5NbkM7IkHuuBlwu │
+│                    │                                                                │ JE3P/IuZKjAsHs9wuDYslOqmVTug4=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:sUARX/W5AIoWg5nBjvWSYQ7JyzO8y/9GXLFxa18RZTj83bw6c4E+HFaJ5K │
+│                    │                                                                │ u1gSq/0cfQYbw=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Unsafe Driving Behavior by Public Bus Driver                   │ [ENC]                                                          │
+│                    │                                                                │ enc:14DgufoHf+UFisNrd0CHddOgWw4pXfNsPuNTc9t5BzTO/umX8kAMWsv2QQ │
+│                    │                                                                │ bnzOdl8iJzsd8YGeBY2EJ6+wMHyuPP5In72ucy                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ I would like to report unsafe driving behavior observed on a   │ [ENC]                                                          │
+│                    │ public bus service. The driver was speeding and braking        │ enc:xRzzPNARrRly6OAFWyNVlP4LABwLk048JLllhE47doxVQXsl5jmsKWRBnN │
+│                    │ suddenly, causing discomfort and safety concerns among         │ OfXi895tPfudjBIceEftnBcyx7zv+/hsQZEA8/Wg2gV81ZdLLfi155JdOFMRn7 │
+│                    │ passengers. I request monitoring and enforcement to ensure     │ dLO7beIPItw1voDXfdMgRgNMriCOHwQbBMLzxs09jSO9Y+U9E3muCZl7jo2SPJ │
+│                    │ drivers follow safety regulations.                             │ 5P5PC4+qNdxbz+/AI09eaIKnDrn8Q36ie7pPEcUYZf0sBtSIsja2Jf5STUCWcg │
+│                    │                                                                │ vfbg2LOJ50HzN0ngIEtpBSkmll5lHrFKw9icQZ8hTXCU5jTFOR0pRVAMoC6Mq3 │
+│                    │                                                                │ ebdGt2VLU5YQqnYK3SYEIb8irLdMy6N1YeVFvh9SO8MudsDCqyIlHwK4aUbdHX │
+│                    │                                                                │ wOxWHb+Nh/p+VW1zPgVGZE8=                                       │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Home Affairs                                                   │ Home Affairs                                                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 8 of 11  —  ID: T-2026-0001
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ T-2026-0001                                                    │ T-2026-0001                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:MHuBC9yO7r2w1q9CYdhixb2t0I5cwrnoKJmhCOHTB61sYDOeYqPbPI0snW │
+│                    │                                                                │ P3BBggWWGkYVZUDqRlLw8LYvIbVUA=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:7lfTuB1YelpHbNfYX8XAAVJ79wxwG70U5KNRmDD0Nr1g736JooFlH3olJA │
+│                    │                                                                │ SxB7gmG7pZJIk=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Traffic Signal Malfunction Causing Congestion                  │ [ENC]                                                          │
+│                    │                                                                │ enc:y1LKRvaeKUYWidqRNg3Bx01aNTNFrLKYiAe06apNMZvw4KRhPK6xVsjm3A │
+│                    │                                                                │ BXGjWFh04feVCDK77hDFq/P+9BsnYZ+8zUodXc9w==                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ The traffic lights at a major intersection have been           │ [ENC]                                                          │
+│                    │ malfunctioning for several days, causing heavy congestion and  │ enc:BJjfEKa7i/Q5R7eQQAEB5+YkPwyGjVd9wNBh3vA5Bn4Yos7eYkqdDw62+z │
+│                    │ confusion among drivers. Vehicles are forced to rely on manual │ mFkV4jzchKeP3RX3CV7OrsQ9fA8xZ/i/nXH3Ekau/pk6immS70UU0EffGLklzc │
+│                    │ judgment, increasing the risk of accidents. Immediate repair   │ dxL2iTsfp+9ep1FRBe7zQYy6wmMtJNZlbG5PkYdQkkR3/vDEOHpXK/ZgJs7IPi │
+│                    │ is requested to restore safe traffic flow.                     │ euJOKpcpW1UKcCxCsOpyrpDDCAV3TCz/dPlQxQjEh+ZcMNsJZHmqKoO+Co0SJb │
+│                    │                                                                │ GaCx9dEFtljtOe9bib6R9raEsNb6EVAy+nXhezojJXGeF6E52/XOiP3RBA90Pc │
+│                    │                                                                │ SECgqgtJhjmekBCFSc0PTB6gu9PwB4FwlcWidApcWQ3fgFBmmbCQMH3EvT2Ngn │
+│                    │                                                                │ xSg0FrP0nhrRJaJgMbAPud75nrfs9vd5YJxh71ZvF9Fk                   │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Transport                                                      │ Transport                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 9 of 11  —  ID: T-2026-0004
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ T-2026-0004                                                    │ T-2026-0004                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ AHMAD AYDIN BIN MOHD SOFFI                                     │ [ENC]                                                          │
+│                    │                                                                │ enc:Ll+roaoIfeCL6HVp8V3YitYkHmU35ETT6M44Fg00WPeaMLwQ5bmBwq0pZ0 │
+│                    │                                                                │ U9Fes/Etl+Uq6q                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ mecimasyi@gmail.com                                            │ [ENC]                                                          │
+│                    │                                                                │ enc:awVuO1p+OrcIBrzaLEE2q390N1hyM0BprbaPSuDjfxY9s/yseBny4rbQFI │
+│                    │                                                                │ tWRuc=                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Collapsed Road Section Creating Immediate Danger               │ [ENC]                                                          │
+│                    │                                                                │ enc:TPUIXVhNQ8+tA7j2mQeou92f5vno8RnQGvfbopzUtlP0pcnQvMrMibH3Rc │
+│                    │                                                                │ cANrO/JS9hNCvYmqKsk9UxxTdp9A2jo+cHO35zI6DyHQ==                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ A section of the main road has partially collapsed, creating a │ [ENC]                                                          │
+│                    │ large hole that poses a serious danger to drivers and          │ enc:VGSD9pDEp9FJ71A4KCR9CbsURugSruVeRUx5tgW9aYkcxZvwZbSGWxisrR │
+│                    │ motorcyclists. Several vehicles were forced to suddenly change │ cSb6VSIFQEwDv5iquTWsyw6JBfI6D3L2WcaYHgacDT7jzvTZF++Nl8LFR1Y0Mq │
+│                    │ lanes to avoid the hazard, increasing accident risk. Immediate │ 0Op9khHg84dZOUMuuZxV+KWasBeNtGZ1T/r5LW+4OzMbXh1GxLG6BWz8l1gQfA │
+│                    │ repair and traffic control measures are urgently required.     │ 784ILWkqeDIs43SSYfxfTf1Agaa2R1iquh0cgZ8JRS8YU5gY18pNNKWsIyKiwp │
+│                    │                                                                │ tcNnB0KV/dgJ6VM3Rn4LPrP4Ca7Dt/dPt2Fvv/b6iYVxc3ZMAU4H3eefdfROq0 │
+│                    │                                                                │ qetcoBycmcxSeRI8pFgQQmHqc9Clno/jkKFbC/UpUtaMY+VVYEMnCoxg5cRJRa │
+│                    │                                                                │ tkLfd35Hr6GUBBuLoQGjvBbbUoE17g6eBqklevdGAA41d3paRAppfhG41UtL4R │
+│                    │                                                                │ CyjfwIhBM=                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Transport                                                      │ Transport                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ High                                                           │ High                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 10 of 11  —  ID: T-2026-0002
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ T-2026-0002                                                    │ T-2026-0002                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:/Yxu+pmhf5Ok1MDV5pxYVkyLRhfyAZ/BW4YbLUnUXxig9I6/IEbzM27uGw │
+│                    │                                                                │ IjgiYOXFNQAcThRSddqa6kJraCbpc=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:UmgyG77m8w9JdSI5+KGVQpErIXiIC+Oh338o/NggGI5voXyDAGq6ZGuAxO │
+│                    │                                                                │ GSzq6jRahJFPY=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Broken Traffic Light Causing Dangerous Road Situation          │ [ENC]                                                          │
+│                    │                                                                │ enc:2GMHx1sXG6972WlR1QR/IcnefDNxgzVYOQMMADJhQQuFjxPYcuE0OLBeIl │
+│                    │                                                                │ DvQ3hIUW37KTbKJXNQp0xqVbUq9hkIiR9uImOZ6KlF++YWGNzK             │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ I would like to report a malfunctioning traffic light at a     │ [ENC]                                                          │
+│                    │ busy intersection that has stopped working completely for the  │ enc:dc4Rds/ZJdYIzfiVQU07+B1UcQgK18XwfsIL+AAkhvrueBYUoblYKN54QH │
+│                    │ past two days. Vehicles from all directions are moving without │ qUGuHWY1jMljkvyHlR/Yg4z1kEWyITsCWQKpmm8ymAo0gy/qdnGYD+6SfDTTEs │
+│                    │ control, creating a high risk of accidents. Several            │ 9j6K8qoJ4mFeBwH2iwQa9poTtzGBl2DMLOukOlnke6ru7ts8fQm4TJ/ckurLI9 │
+│                    │ near-collision incidents have already occurred during peak     │ 3VXahXnVS9SLdLP+iFeGMkC+9PQ6vIRFDRBL9ZzGUpMe1BhISX83sdU49HkaiB │
+│                    │ hours. Immediate repair and traffic management intervention    │ mKO8p7UQPxgk0JarxGOmLFIxidvGOIgK8mWhuVOGNrx/+ImZHWoRPXx564V1Eh │
+│                    │ are urgently required to prevent serious accidents and ensure  │ oN4lzR6wLqZz0m2owU5IA/Js/1CKPyrPOFOosfNreKJpIYP7QW4St+AdrJ3W0h │
+│                    │ public safety.                                                 │ hkDixUBkkhv1JRViY6dk1HnAnJD4nH/vySLO5bUICcp1qfbOUmE6YjjGDYgNL4 │
+│                    │                                                                │ 8TzUoTr5DpvmCIkOxT4E5Ha+FADnfhDDvdL6/19Ov5FTma4+mTvg63m1hbLCJw │
+│                    │                                                                │ e9g1IbIOIBpQVAMgee5D6L047ekua8J9NwdQb5fDc+ZDsikCAdG/Xf2/xIruEY │
+│                    │                                                                │ fob2x5ppIDqRSiQ7Msm3hAK7N7XVcVhwe1J96cnjOGOklysbP/z8eU7JQe     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Transport                                                      │ Transport                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ High                                                           │ High                                                           │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Complaint 11 of 11  —  ID: T-2026-0003
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ id                 │ T-2026-0003                                                    │ T-2026-0003                                                    │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenName        │ NISRINA MASYITAH BINTI MOHD NOR ZAIDI                          │ [ENC]                                                          │
+│                    │                                                                │ enc:OrV2x/gCyXr6unq3MqI8Shj3qLIv13BABdjbOLLUxOIu29+ZLHwBUDh7Gt │
+│                    │                                                                │ ulFt57CZjxf9YV3LMAq6ekPdbSJw0=                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ citizenEmail       │ nisrinamasyitah@gmail.com                                      │ [ENC]                                                          │
+│                    │                                                                │ enc:s+XQbqTAhYwY8d2CBOhnVh5jmIEZdzRaM0HyhO3c+tuGs+WOi2t1UBV5iw │
+│                    │                                                                │ rF9spwWG2I8jg=                                                 │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ title              │ Suggestion to Improve Waiting Area Comfort                     │ [ENC]                                                          │
+│                    │                                                                │ enc:bWvZ3s1dZwQu9t4y+H8ZjTRaoV9w51mbXqkwyH46dIuAjHBjfZ4cvhqZ48 │
+│                    │                                                                │ 5tsOHOcXgR8utdiYJg46rZx7kNpJckgrOnjQ==                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ description        │ I would like to suggest improvements to the waiting area at a  │ [ENC]                                                          │
+│                    │ public service office. While the services provided are         │ enc:YhqIVSsru2AoH24sYl5DeFkE6FL3XS/FG+1osrpK0Wt4enYg3GJKgV//dw │
+│                    │ satisfactory, the seating arrangement is limited and can       │ R2P7a2pE32LZv2s7uxF9UfGscg5TjJQJWyVLZPlhH3WVPWIR3wyq+5mbT06ZFt │
+│                    │ become uncomfortable during busy hours. Adding more chairs and │ A5N2ElmKDyrzmXO/bvpLV5Jp1nfefT1ohPxrdmPEgea37IiL0Eb6n2ZBAUF29R │
+│                    │ improving the layout would enhance visitor comfort and overall │ 95FrvzsXUJCJWuofZqvucj3kbHFv89PVX963pXKdDr5KQmq3D6XSfmc2R1XSrb │
+│                    │ experience.                                                    │ /Pp9s3tb+jM/rT14VSR5i2QOZnJxMZNsm0NFHESrmL0ap8yQ+9LswNmaXbel3L │
+│                    │                                                                │ 4oEIl2bUD8dqhAXntIlY8/qW/DjUfCoc5Lm3k4L4Fxd2JslDDtk9sveasxI5aU │
+│                    │                                                                │ SIVk5+qo6o8nlWboQ8fzA+/5KnChdXL0gAiG2IQ+S/fqsZZfnwLQpC/dNAPcpW │
+│                    │                                                                │ H79h0X/OHlHYukAII3GIlh                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ ministry           │ Transport                                                      │ Transport                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ priority           │ Medium                                                         │ Medium                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ status             │ Submitted                                                      │ Submitted                                                      │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ date               │ 2026-03-01                                                     │ 2026-03-01                                                     │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ adminNotes         │ (none)                                                         │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ _integrity         │ n/a (submitted before integrity was added)                     │ (none)                                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+═════════════════════════════════════════════════════  COLLECTION : activityLogs  (20 entries)  ══════════════════════════════════════════════════════
+
+  User: enc:FShyyNOruCLMc1UaI09LWJu+OoHW2CXKt2SF8D7Wl1WSVG+wNK+5XTMo4GtRNJ9kcf6v+loXwXPfilzfDfkoyGY=  (UID: Gql6NZInGUMGitFEhyViVtpyuR63)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 20/05/2026, 9:35:13 am                                         │ 20/05/2026, 9:35:13 am                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 20/05/2026, 9:34:12 am                                         │ 20/05/2026, 9:34:12 am                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 18/05/2026, 9:37:24 am                                         │ 18/05/2026, 9:37:24 am                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 06/04/2026, 12:17:34 am                                        │ 06/04/2026, 12:17:34 am                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Password Changed                                               │ Password Changed                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 01/03/2026, 12:41:57 pm                                        │ 01/03/2026, 12:41:57 pm                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Password Changed                                               │ Password Changed                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 01/03/2026, 12:37:42 pm                                        │ 01/03/2026, 12:37:42 pm                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 01/03/2026, 12:36:58 pm                                        │ 01/03/2026, 12:36:58 pm                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  User: enc:WaMg4SNIGjU8uICA8mdExVDIYz8DcHpfOoJV3sUY5NrGyXrhWDHEZQ==  (UID: KGQod3HeSpWHOSd3Y3E3lLOvLQ92)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:14:41 pm                                         │ 19/05/2026, 1:14:41 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:14:29 pm                                         │ 19/05/2026, 1:14:29 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:35 pm                                         │ 19/05/2026, 1:13:35 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:35 pm                                         │ 19/05/2026, 1:13:35 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:35 pm                                         │ 19/05/2026, 1:13:35 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:35 pm                                         │ 19/05/2026, 1:13:35 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:34 pm                                         │ 19/05/2026, 1:13:34 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:34 pm                                         │ 19/05/2026, 1:13:34 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:32 pm                                         │ 19/05/2026, 1:13:32 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on Windows 10/11                                        │ Chrome on Windows 10/11                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 19/05/2026, 1:13:05 pm                                         │ 19/05/2026, 1:13:05 pm                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  User: enc:6AWEK5AytdCi7W4zK7EPDD6JKzg8sVrKlJOrr3e1FFAjmRJhQDmk0sWG1kd9ptBY7HCfwUZR  (UID: A1yERjYnZmUfmNadLeCGWTLVFWB2)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FIELD              │ PLAIN TEXT  (what the user actually sees)                      │ FIRESTORE  (what is physically stored in the database)         │
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 06/04/2026, 9:42:06 am                                         │ 06/04/2026, 9:42:06 am                                         │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Profile Updated                                                │ Profile Updated                                                │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 01/03/2026, 12:56:44 pm                                        │ 01/03/2026, 12:56:44 pm                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ event              │ Successful Login                                               │ Successful Login                                               │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ device             │ Chrome on macOS 10.15.7                                        │ Chrome on macOS 10.15.7                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ timestamp          │ 01/03/2026, 12:56:32 pm                                        │ 01/03/2026, 12:56:32 pm                                        │
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+═════════════════════════════════════════════════════════════════════  SUMMARY  ══════════════════════════════════════════════════════════════════════
+
+  users        : 3 total  |  3 with AES-encrypted PII  |  0 legacy plaintext
+  complaints   : 11 total  |  0 encrypted  |  11 legacy
+  activityLogs : 20 total  |  no sensitive PII — plaintext by design
+
+  Encrypted fields:
+    users      →  fullName, email, phone, icNumber  (+ password shown encrypted for legacy records)
+    complaints →  title, description, citizenName, citizenEmail  +  HMAC-SHA256 _integrity
+
+  Passwords are NEVER stored in Firestore.
+  Firebase Auth handles password hashing server-side (bcrypt).
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  END OF REPORT
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
