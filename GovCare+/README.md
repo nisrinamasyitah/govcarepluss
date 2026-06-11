@@ -1,16 +1,96 @@
-# React + Vite
+# GovCare+
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A civic complaint and public service tracking web application built with React, Firebase, and Vite. GovCare+ allows citizens to submit complaints, track their status, and receive updates from government administrators.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Complaint Submission** — Citizens can submit public service complaints with supporting details
+- **Status Tracking** — Real-time complaint status tracking with a unique tracking ID
+- **Admin Dashboard** — Administrators can manage, respond to, and update complaint statuses
+- **FAQ & Help Center** — Built-in FAQ and help pages for user guidance
+- **AES-GCM Encryption** — Sensitive PII is encrypted before being stored in Firestore
+- **reCAPTCHA Protection** — Bot protection on forms via Google reCAPTCHA
+- **Secure Auth** — Separate login flows for citizens and admins
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React 19, React Router v7, Vite
+- **Backend/DB:** Firebase Firestore, Firebase Hosting, Firebase Functions
+- **Security:** AES-GCM client-side encryption, Firestore security rules, Google reCAPTCHA
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js >= 18
+- Firebase CLI (`npm install -g firebase-tools`)
+
+### Installation
+
+```bash
+git clone https://github.com/nisrinamasyitah/govcarepluss.git
+cd govcarepluss/GovCare+
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file in the `GovCare+` directory:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_key
+VITE_ENCRYPTION_KEY=your_aes_encryption_key
+```
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+### Build
+
+```bash
+npm run build
+```
+
+### Deploy to Firebase
+
+```bash
+firebase deploy
+```
+
+## Project Structure
+
+```
+GovCare+/
+├── src/
+│   ├── pages/
+│   │   ├── MainPage.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── RegisterPage.jsx
+│   │   ├── DashboardPage.jsx
+│   │   ├── SubmitComplaintPage.jsx
+│   │   ├── TrackingStatusPage.jsx
+│   │   ├── ProfilePage.jsx
+│   │   ├── FAQPage.jsx
+│   │   ├── HelpCenterPage.jsx
+│   │   ├── AdminLoginPage.jsx
+│   │   └── AdminDashboardPage.jsx
+│   ├── firebase.js
+│   ├── crypto.js
+│   └── App.jsx
+├── functions/
+├── firestore.rules
+└── firebase.json
+```
+
+## License
+
+This project is for educational and civic purposes.
