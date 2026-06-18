@@ -718,7 +718,7 @@ export default function MainPage() {
           <p className="hero-subtitle">{t.heroSubtitle}</p>
           <div className="hero-buttons">
             <a href="/login" className="btn-primary">{t.submitComplaint}</a>
-            <a href="/track-status" className="btn-secondary">{t.trackStatus}</a>
+            <a href="/login" className="btn-secondary">{t.trackStatus}</a>
           </div>
         </div>
       </div>
@@ -889,7 +889,7 @@ export default function MainPage() {
               <ul>
                 <li><a href="/">{t.navHome}</a></li>
                 <li><a href="/login">{t.submitComplaint}</a></li>
-                <li><a href="/track-status">{t.trackStatus}</a></li>
+                <li><a href="/login">{t.trackStatus}</a></li>
                 <li><a href="/faq">{t.faq}</a></li>
               </ul>
             </div>
