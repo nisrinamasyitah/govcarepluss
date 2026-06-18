@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy, limit, doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from '../firebase';
 import { encrypt, decrypt, safeDecrypt, isEncrypted, verifyIntegrity } from '../crypto';
 
 const css = `
@@ -254,13 +255,14 @@ const css = `
 `;
 
 export default function EncryptionDemoPage() {
-  const [users, setUsers]           = useState(null);   // null = loading
-  const [complaints, setComplaints] = useState(null);
+  const [adminStatus, setAdminStatus] = useState('checking'); // 'checking' | 'ok' | 'denied'
+  const [users, setUsers]             = useState(null);
+  const [complaints, setComplaints]   = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [flash, setFlash]           = useState(false);
+  const [flash, setFlash]             = useState(false);
 
   // Custom sandbox
-  const [customText, setCustomText]   = useState('');
+  const [customText, setCustomText]     = useState('');
   const [customResult, setCustomResult] = useState(null);
   const [customLoading, setCustomLoading] = useState(false);
 
@@ -318,6 +320,19 @@ export default function EncryptionDemoPage() {
   }
 
   useEffect(() => {
+    // First check if current user is an admin
+    const unsubAuth = onAuthStateChanged(auth, async user => {
+      if (!user) { setAdminStatus('denied'); return; }
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (!adminDoc.exists()) { setAdminStatus('denied'); return; }
+      setAdminStatus('ok');
+    });
+    return unsubAuth;
+  }, []);
+
+  useEffect(() => {
+    if (adminStatus !== 'ok') return;
+
     const qUsers = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(15));
     const unsubUsers = onSnapshot(qUsers, async snap => {
       const processed = await Promise.all(snap.docs.map(processUser));
@@ -333,7 +348,7 @@ export default function EncryptionDemoPage() {
     }, () => setComplaints([]));
 
     return () => { unsubUsers(); unsubComplaints(); };
-  }, []);
+  }, [adminStatus]);
 
   async function handleCustom() {
     if (!customText.trim()) return;
@@ -345,6 +360,35 @@ export default function EncryptionDemoPage() {
   }
 
   const totalRecords = (users?.length ?? 0) + (complaints?.length ?? 0);
+
+  if (adminStatus === 'checking') {
+    return (
+      <>
+        <style>{css}</style>
+        <div className="demo-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="loading-row"><div className="spinner"/>Checking credentials…</div>
+        </div>
+      </>
+    );
+  }
+
+  if (adminStatus === 'denied') {
+    return (
+      <>
+        <style>{css}</style>
+        <div className="demo-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
+          <div style={{ fontSize: 32 }}>🔒</div>
+          <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18 }}>Admin access required</div>
+          <div style={{ color: '#64748b', fontSize: 14, textAlign: 'center', maxWidth: 340 }}>
+            This page shows sensitive encrypted data and can only be viewed by admins.
+          </div>
+          <a href="/admin/login" style={{ marginTop: 8, background: 'linear-gradient(135deg,#6E4978,#8a5a96)', color: '#fff', padding: '12px 28px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+            Go to Admin Login
+          </a>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
