@@ -301,6 +301,19 @@ html, body { margin:0; padding:0; }
 .submit-page.dark .file-remove:hover { background:#3d1515; }
 .submit-page.dark .lang-option:hover { background:#334155; }
 .submit-page.dark .back-link { color:#94a3b8; }
+@media (max-width:1024px) {
+  .top-nav { padding:0 20px; }
+  .page-content { padding:24px 20px; }
+}
+@media (max-width:767px) {
+  .top-nav { padding:0 16px; height:60px; }
+  .brand-name { font-size:17px; }
+  .nav-right { gap:8px; }
+  .lang-btn span:last-of-type { display:none; }
+  .user-info { display:none; }
+  .page-content { padding:16px; }
+  .page-header h1 { font-size:22px; }
+}
 `;
 
 export default function SubmitComplaintPage() {

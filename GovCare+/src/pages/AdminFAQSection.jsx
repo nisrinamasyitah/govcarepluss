@@ -206,6 +206,30 @@ const faqAdminCss = `
   }
   .faq-modal-cancel:hover { background: #475569; color: #e2e8f0; }
   .faq-admin-loading { padding: 60px 20px; text-align: center; color: #475569; font-size: 13px; }
+
+  /* ── iPad (768–1024px) ── */
+  @media (max-width: 1024px) {
+    .faq-admin-kpis { grid-template-columns: repeat(2, 1fr); }
+    .faq-admin-toolbar { flex-wrap: wrap; }
+  }
+
+  /* ── Phone (≤ 767px) ── */
+  @media (max-width: 767px) {
+    .faq-admin-kpis { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .faq-admin-kpi { padding: 14px 16px; }
+    .faq-admin-kpi-val { font-size: 24px; }
+    .faq-admin-header { flex-direction: column; align-items: flex-start; }
+    .faq-admin-add-btn { width: 100%; justify-content: center; }
+    .faq-admin-search { min-width: unset; width: 100%; }
+    .faq-admin-filter { width: 100%; }
+    .faq-admin-card { flex-direction: column; gap: 12px; }
+    .faq-admin-card-actions { flex-direction: row; flex-wrap: wrap; }
+    .faq-admin-a { white-space: normal; }
+    .faq-modal-row { grid-template-columns: 1fr; gap: 0; }
+    .faq-modal { max-width: calc(100vw - 24px); border-radius: 14px; }
+    .faq-modal-footer { flex-direction: column-reverse; }
+    .faq-modal-save, .faq-modal-cancel { width: 100%; text-align: center; }
+  }
 `;
 
 const STYLE_ID = 'govcare-faq-admin-css';

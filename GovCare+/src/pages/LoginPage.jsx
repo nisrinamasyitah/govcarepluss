@@ -262,6 +262,13 @@ const css = `
 
   .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 24px; }
 
+  @media (max-width: 767px) {
+    .login-page { padding: 24px 12px; align-items: flex-start; padding-top: 32px; }
+    .login-container { padding: 32px 20px; border-radius: 16px; }
+    .captcha-wrapper { overflow-x: auto; }
+    .captcha-wrapper > div { transform-origin: 0 0; }
+  }
+
   /* Custom Modal */
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5);

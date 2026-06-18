@@ -343,12 +343,67 @@ const css = `
     .info-content { flex-direction: column; }
     .footer-top { grid-template-columns: 1fr 1fr; }
   }
+  /* Mobile hamburger */
+  .mobile-menu-btn {
+    display: none; align-items: center; justify-content: center;
+    width: 40px; height: 40px; background: #f3f4f6; border: 1px solid #e5e7eb;
+    border-radius: 8px; cursor: pointer; color: #374151; flex-shrink: 0;
+  }
+  body.dark-mode .mobile-menu-btn { background: #334155; border-color: #475569; color: #e2e8f0; }
+  .mobile-nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 998; }
+  .mobile-nav-overlay.open { display: block; }
+  .mobile-nav-panel {
+    display: none; flex-direction: column; position: fixed; top: 0; right: -300px;
+    width: 280px; height: 100vh; background: white; z-index: 999;
+    padding: 80px 20px 32px; box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+    transition: right 0.28s ease;
+  }
+  .mobile-nav-panel.open { display: flex; right: 0; }
+  body.dark-mode .mobile-nav-panel { background: #1e293b; }
+  .mobile-nav-panel ul { list-style: none; margin-bottom: 24px; }
+  .mobile-nav-panel ul li { margin-bottom: 4px; }
+  .mobile-nav-panel ul li a { display: block; padding: 12px 16px; color: #374151; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: 8px; transition: background 0.2s; }
+  .mobile-nav-panel ul li a:hover { background: #f3f4f6; color: #090088; }
+  body.dark-mode .mobile-nav-panel ul li a { color: #e2e8f0; }
+  body.dark-mode .mobile-nav-panel ul li a:hover { background: #334155; }
+  .mobile-nav-btns { display: flex; flex-direction: column; gap: 10px; }
+  .mobile-nav-btns a { display: block; text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+
+  @media (max-width: 1024px) {
+    .header { padding: 0 32px; }
+    .hero { padding: 60px 40px 80px; }
+    .hero h1 { font-size: 36px; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .info-content { flex-direction: column; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .statistics { padding: 60px 40px; }
+    .features { padding: 60px 40px; }
+    .info-section { padding: 60px 40px; }
+    .footer { padding: 60px 40px; }
+  }
+
   @media (max-width: 768px) {
-    .header { padding: 0 20px; }
+    .header { padding: 0 20px; height: 64px; }
     .header-nav { display: none; }
+    .mobile-menu-btn { display: flex; }
+    .hero { padding: 48px 20px 64px; }
+    .hero h1 { font-size: 28px; }
+    .hero-description { font-size: 16px; }
+    .hero-buttons { flex-direction: column; align-items: center; gap: 12px; }
+    .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
     .features-grid { grid-template-columns: 1fr; }
-    .stats-grid { flex-direction: column; gap: 40px; }
-    .footer-top { grid-template-columns: 1fr; }
+    .features { padding: 48px 20px; }
+    .statistics { padding: 48px 20px; }
+    .statistics-header h2 { font-size: 24px; }
+    .stats-grid { flex-direction: column; gap: 32px; }
+    .stat-number { font-size: 36px; }
+    .info-section { padding: 48px 20px; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .footer { padding: 48px 20px; }
+    .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    .footer-links-bottom { flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .brand-name { font-size: 18px; }
+    .brand-tagline { display: none; }
   }
 
   /* ── FAQ TEASER SECTION ── */
@@ -533,6 +588,7 @@ export default function MainPage() {
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState('en');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Load saved preferences on mount
@@ -575,6 +631,9 @@ export default function MainPage() {
 
       {/* Header */}
       <div className="header">
+        <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(o => !o)} aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <div className="header-left">
           <div className="logo-container" onClick={() => window.location.href = '/'}>
             <div className="jata-negara">
@@ -794,6 +853,22 @@ export default function MainPage() {
           <div className="info-image">
             <img src="/pictures/MainPage.jpeg" alt="GovCare+ Dashboard Preview" />
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Nav */}
+      <div className={`mobile-nav-overlay${mobileMenuOpen ? ' open' : ''}`} onClick={() => setMobileMenuOpen(false)} />
+      <div className={`mobile-nav-panel${mobileMenuOpen ? ' open' : ''}`}>
+        <ul>
+          <li><a href="#home" onClick={() => setMobileMenuOpen(false)}>{t.navHome}</a></li>
+          <li><a href="#features" onClick={() => setMobileMenuOpen(false)}>{t.navFeatures}</a></li>
+          <li><a href="#about" onClick={() => setMobileMenuOpen(false)}>{t.navAbout}</a></li>
+          <li><a href="/faq" onClick={() => setMobileMenuOpen(false)}>{t.navFaq}</a></li>
+          <li><a href="#contact" onClick={() => setMobileMenuOpen(false)}>{t.navContact}</a></li>
+        </ul>
+        <div className="mobile-nav-btns">
+          <a href="/login" style={{background:'#090088',color:'white'}}>{t.loginBtn}</a>
+          <a href="/register" style={{background:'transparent',color:'#090088',border:'1.5px solid #090088'}}>{t.registerBtn}</a>
         </div>
       </div>
 

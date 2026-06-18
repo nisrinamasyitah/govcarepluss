@@ -159,6 +159,38 @@ html, body { margin:0; padding:0; }
 .profile-page.dark .timeline-meta { color:#64748b; }
 .profile-page.dark .form-field input::placeholder { color:#64748b; }
 .profile-page.dark .timeline-dot { border-color:#1e293b; box-shadow:0 0 0 2px #334155; }
+
+/* ── iPad (768–1024px) ── */
+@media (max-width:1024px) {
+  .top-nav { padding:0 20px; }
+  .container { padding:28px 20px; }
+  .profile-info-section { padding:0 28px 24px; }
+}
+
+/* ── Phone (≤ 767px) ── */
+@media (max-width:767px) {
+  .top-nav { padding:0 16px; height:60px; }
+  .brand-name { font-size:17px; }
+  .back-link span { display:none; }
+  .container { padding:16px; }
+  .profile-banner { height:100px; }
+  .profile-avatar { width:76px; height:76px; font-size:26px; }
+  .profile-avatar-wrapper { top:-38px; left:16px; }
+  .profile-info-section { padding:0 16px 20px; }
+  .profile-header-content { margin-left:0; padding-top:52px; }
+  .profile-name { font-size:18px; }
+  .profile-stats { flex-wrap:wrap; gap:12px; }
+  .tabs-nav { padding:0 8px; overflow-x:auto; flex-wrap:nowrap; }
+  .tabs-nav::-webkit-scrollbar { display:none; }
+  .tab-btn { padding:14px 16px; white-space:nowrap; font-size:13px; }
+  .tab-content { padding:20px 16px; }
+  .form-row { grid-template-columns:1fr; gap:16px; }
+  .button-group { flex-direction:column; }
+  .button-group .btn { width:100%; text-align:center; }
+  .profile-page .nav-right { gap:8px; }
+  .lang-btn span:last-of-type { display:none; }
+  .success-toast { bottom:16px; right:16px; left:16px; text-align:center; }
+}
 `;
 
 // ── Detect real browser + OS from User-Agent ─────────────────────────────────

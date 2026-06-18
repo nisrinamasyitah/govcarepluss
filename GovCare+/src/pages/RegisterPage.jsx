@@ -303,7 +303,12 @@ const css = `
   .register-page.dark .security-note { color: #64748b; }
   .security-badge { background: #dcfce7; color: #16a34a; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
-  .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 8px; }
+  .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 8px; overflow-x: auto; }
+
+  @media (max-width: 767px) {
+    .register-page { padding: 24px 12px; align-items: flex-start; padding-top: 32px; }
+    .register-container { padding: 32px 20px; border-radius: 16px; }
+  }
 
   /* Modal */
   .modal-overlay {

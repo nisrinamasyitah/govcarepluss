@@ -899,6 +899,48 @@ const css = `
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+  /* Hamburger button */
+  .admin-hamburger-btn { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; background: #334155; border: none; border-radius: 8px; color: #94a3b8; cursor: pointer; flex-shrink: 0; }
+  .admin-hamburger-btn:hover { background: #475569; color: #e2e8f0; }
+  .admin-page.light .admin-hamburger-btn { background: #f3f4f6; border: 1px solid #e5e7eb; color: #6b7280; }
+
+  /* Overlay */
+  .admin-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; }
+  .admin-sidebar-overlay.open { display: block; }
+
+  /* ── iPad (768–1024px) ── */
+  @media (max-width: 1024px) {
+    .admin-nav { padding: 0 20px; }
+    .admin-nav-title { display: none; }
+    .admin-sidebar { width: 200px; }
+    .admin-content { padding: 20px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Phone (≤ 767px) ── */
+  @media (max-width: 767px) {
+    .admin-hamburger-btn { display: flex; }
+    .admin-nav { padding: 0 16px; height: 56px; }
+    .admin-logo-name { font-size: 15px; }
+    .admin-badge { display: none; }
+    .admin-divider { display: none; }
+    .admin-user-name { display: none; }
+    .admin-user-role { display: none; }
+    .admin-sidebar {
+      position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
+      z-index: 200; padding-top: 56px; transition: left 0.28s ease;
+      overflow-y: auto;
+    }
+    .admin-sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
+    .admin-content { padding: 16px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .modal-panel { width: calc(100vw - 24px); margin: 12px; max-height: 92vh; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .modal-footer { flex-direction: column; }
+    .btn-cancel { order: 2; }
+    .toast { right: 12px; left: 12px; bottom: 16px; }
+  }
 `;
 
 export default function AdminDashboardPage() {
@@ -955,6 +997,7 @@ export default function AdminDashboardPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [reportsPeriod, setReportsPeriod] = useState('30d');
   const [reportsTab, setReportsTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [readIds, setReadIds] = useState(() => {
     try { return JSON.parse(localStorage.getItem('govcare-notif-read') || '[]'); } catch { return []; }
@@ -3198,7 +3241,7 @@ export default function AdminDashboardPage() {
   function SidebarLink({ id, label, icon, count }) {
     return (
       <li>
-        <a href="#" className={activeNav === id ? 'active' : ''} onClick={e => { e.preventDefault(); goTo(id); }}>
+        <a href="#" className={activeNav === id ? 'active' : ''} onClick={e => { e.preventDefault(); goTo(id); setSidebarOpen(false); }}>
           <span className="sidebar-icon">{icon}</span>
           {label}
           {count > 0 && <span className="sidebar-count">{count}</span>}
@@ -3215,6 +3258,9 @@ export default function AdminDashboardPage() {
         {/* Top Nav */}
         <div className="admin-nav">
           <div className="admin-nav-left">
+            <button className="admin-hamburger-btn" onClick={() => setSidebarOpen(o => !o)} aria-label="Toggle menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <a href="/admin/dashboard" className="admin-logo">
               <img src="/pictures/Malaysia.svg" alt="Logo" />
               <span className="admin-logo-name">GovCare+</span>
@@ -3315,9 +3361,10 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="admin-layout">
+          <div className={`admin-sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={() => setSidebarOpen(false)} />
 
           {/* Sidebar */}
-          <div className="admin-sidebar">
+          <div className={`admin-sidebar${sidebarOpen ? ' open' : ''}`}>
 
             <div className="sidebar-section-label">Main</div>
             <ul className="sidebar-nav">
@@ -3340,7 +3387,7 @@ export default function AdminDashboardPage() {
                 const isActive = activeNav === 'all-complaints' && filterMinistry === m;
                 return (
                   <li key={m}>
-                    <a href="#" className={isActive ? 'active' : ''} onClick={e => { e.preventDefault(); setFilterMinistry(m); goTo('all-complaints'); }}>
+                    <a href="#" className={isActive ? 'active' : ''} onClick={e => { e.preventDefault(); setFilterMinistry(m); goTo('all-complaints'); setSidebarOpen(false); }}>
                       <span style={{ width: 10, height: 10, borderRadius: '50%', background: MINISTRY_COLORS[m], flexShrink: 0, display: 'inline-block' }}></span>
                       {m}
                       <span style={{ marginLeft: 'auto', fontSize: 11, color: '#475569', fontWeight: 600 }}>{count}</span>

@@ -377,6 +377,41 @@ const css = `
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+  /* ── Hamburger (mobile only) ── */
+  .hamburger-btn { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; color: #374151; flex-shrink: 0; }
+  .help-page.dark .hamburger-btn { background: #334155; border-color: #475569; color: #e2e8f0; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 150; }
+  .sidebar-overlay.open { display: block; }
+
+  /* ── iPad (768–1024px) ── */
+  @media (max-width: 1024px) {
+    .top-nav { padding: 0 20px; }
+    .sidebar { width: 220px; padding: 20px 12px; }
+    .help-main { padding: 24px 20px; }
+    .contact-cards { grid-template-columns: repeat(2, 1fr); }
+    .notif-dropdown { width: 320px; }
+  }
+
+  /* ── Phone (≤ 767px) ── */
+  @media (max-width: 767px) {
+    .hamburger-btn { display: flex; }
+    .top-nav { padding: 0 16px; height: 60px; gap: 8px; }
+    .brand-name { font-size: 17px; }
+    .nav-right { gap: 8px; }
+    .user-info { display: none; }
+    .user-profile { padding: 6px; }
+    .language-btn span:last-of-type { display: none; }
+    .notif-dropdown { width: calc(100vw - 32px); right: -60px; }
+    .help-layout { position: relative; }
+    .sidebar { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; z-index: 200; padding-top: 68px; transition: left 0.28s ease; box-shadow: none; }
+    .sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.18); }
+    .help-main { padding: 20px 16px; }
+    .contact-cards { grid-template-columns: 1fr; }
+    .ministry-grid { grid-template-columns: 1fr; }
+    .chat-fab { bottom: 20px; right: 20px; width: 52px; height: 52px; }
+    .chat-window { bottom: 84px; right: 16px; width: calc(100vw - 32px); }
+  }
 `;
 
 export default function HelpCenterPage() {
@@ -385,6 +420,7 @@ export default function HelpCenterPage() {
   const [language, setLanguage] = useState('en');
   const [langOpen, setLangOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
@@ -548,6 +584,9 @@ export default function HelpCenterPage() {
         {/* Top Nav */}
         <div className="top-nav">
           <div className="nav-left">
+            <button className="hamburger-btn" onClick={() => setSidebarOpen(o => !o)} aria-label="Toggle menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <Link to="/dashboard" className="logo-container">
               <div className="jata-negara"><img src="/pictures/Malaysia.svg" alt="Jata Negara Malaysia" /></div>
               <div className="brand-name">GovCare+</div>
@@ -647,32 +686,33 @@ export default function HelpCenterPage() {
 
         {/* Layout */}
         <div className="help-layout">
+          <div className={`sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={() => setSidebarOpen(false)} />
 
           {/* Sidebar */}
-          <div className="sidebar">
+          <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
             <div className="sidebar-section">
               <div className="sidebar-title">{t.menu}</div>
               <ul className="sidebar-menu">
                 <li>
-                  <Link to="/dashboard">
+                  <Link to="/dashboard" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
                     {t.home}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/submit-complaint">
+                  <Link to="/submit-complaint" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
                     {t.submitComplaint}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/track-status">
+                  <Link to="/track-status" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
                     {t.trackStatus}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/profile">
+                  <Link to="/profile" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                     {t.profile}
                   </Link>
@@ -683,7 +723,7 @@ export default function HelpCenterPage() {
               <div className="sidebar-title">{t.support}</div>
               <ul className="sidebar-menu">
                 <li>
-                  <Link to="/help-center" className="active">
+                  <Link to="/help-center" className="active" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                     {t.helpCenter}
                   </Link>

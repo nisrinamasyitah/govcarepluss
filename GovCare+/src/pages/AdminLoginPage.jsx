@@ -193,7 +193,23 @@ const css = `
   .right-footer { margin-top: 32px; text-align: center; }
   .right-footer p { font-size: 12px; color: #334155; }
 
-  .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 20px; }
+  .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 20px; overflow-x: auto; }
+
+  /* ── iPad (768–1024px) ── */
+  @media (max-width: 1024px) {
+    .admin-left-panel { width: 45%; padding: 36px 32px; }
+    .admin-right-panel { width: 55%; padding: 36px 32px; }
+    .left-hero h1 { font-size: 32px; }
+    .left-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Phone (≤ 767px) ── */
+  @media (max-width: 767px) {
+    .admin-login-page { flex-direction: column; }
+    .admin-left-panel { display: none; }
+    .admin-right-panel { width: 100%; padding: 40px 24px; min-height: 100vh; justify-content: flex-start; padding-top: 60px; }
+    .right-form-wrap { max-width: 100%; }
+  }
 
   /* Light Mode */
   .admin-login-page.light .admin-right-panel { background: #f8fafc; }

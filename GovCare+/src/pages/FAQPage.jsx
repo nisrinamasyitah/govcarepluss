@@ -375,6 +375,69 @@ const css = `
     transition: all 0.2s; font-family: 'Inter', sans-serif; white-space: nowrap;
   }
   .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+
+  /* Hamburger button — mobile only */
+  .hamburger-btn {
+    display: none; align-items: center; justify-content: center;
+    width: 40px; height: 40px; background: #f3f4f6; border: 1px solid #e5e7eb;
+    border-radius: 10px; cursor: pointer; color: #374151; flex-shrink: 0;
+  }
+  .faq-page.dark .hamburger-btn { background: #334155; border-color: #475569; color: #e2e8f0; }
+
+  /* Sidebar overlay — mobile only */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 150;
+  }
+  .sidebar-overlay.open { display: block; }
+
+  /* ── iPad (768px – 1024px) ── */
+  @media (max-width: 1024px) {
+    .top-nav { padding: 0 20px; }
+    .sidebar { width: 220px; padding: 20px 12px; }
+    .main-content { padding: 24px 20px; }
+    .contact-bar { padding: 22px 24px; }
+  }
+
+  /* ── Phone (≤ 767px) ── */
+  @media (max-width: 767px) {
+    .hamburger-btn { display: flex; }
+
+    .top-nav { padding: 0 16px; height: 60px; gap: 8px; }
+    .brand-name { font-size: 17px; }
+    .nav-right { gap: 8px; }
+
+    /* Hide user name/email on phone, show avatar only */
+    .user-profile > div:last-child { display: none; }
+    .user-profile { padding: 6px; }
+
+    /* Language btn — icon only */
+    .language-btn span:last-of-type { display: none; }
+
+    /* Sidebar slides in from left */
+    .page-layout { position: relative; }
+    .sidebar {
+      position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
+      z-index: 200; padding-top: 72px; transition: left 0.28s ease; box-shadow: none;
+    }
+    .sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.18); }
+
+    .main-content { padding: 20px 16px; max-width: 100%; }
+
+    .page-header h1 { font-size: 22px; }
+    .page-header p { font-size: 13px; }
+
+    /* Category pills scroll horizontally */
+    .cat-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .cat-pills::-webkit-scrollbar { display: none; }
+    .cat-pill { white-space: nowrap; }
+
+    .contact-bar { flex-direction: column; padding: 20px 16px; gap: 16px; }
+    .contact-bar-text h3 { font-size: 15px; }
+    .contact-btn { width: 100%; text-align: center; }
+
+    .faq-q { padding: 14px 14px; }
+    .faq-a { padding: 0 14px 14px; }
+  }
 `;
 
 export default function FAQPage() {
@@ -386,6 +449,7 @@ export default function FAQPage() {
   const [activeCat, setActiveCat] = useState('all');
   const [search, setSearch] = useState('');
   const [openIdx, setOpenIdx] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const langRef = useRef(null);
   const t = translations[language];
@@ -452,6 +516,9 @@ export default function FAQPage() {
         {/* Top Nav */}
         <nav className="top-nav">
           <div className="nav-left">
+            <button className="hamburger-btn" onClick={() => setSidebarOpen(o => !o)} aria-label="Toggle menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <Link to="/dashboard" className="logo-container">
               <span className="brand-name">GovCare+</span>
             </Link>
@@ -491,31 +558,34 @@ export default function FAQPage() {
         </nav>
 
         <div className="page-layout">
+          {/* Mobile overlay */}
+          <div className={`sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={() => setSidebarOpen(false)} />
+
           {/* Sidebar */}
-          <aside className="sidebar">
+          <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
             <div className="sidebar-section">
               <div className="sidebar-title">{t.menu}</div>
               <ul className="sidebar-menu">
                 <li>
-                  <Link to="/dashboard">
+                  <Link to="/dashboard" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
                     {t.home}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/submit-complaint">
+                  <Link to="/submit-complaint" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
                     {t.submitComplaint}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/track-status">
+                  <Link to="/track-status" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
                     {t.trackStatus}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/profile">
+                  <Link to="/profile" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                     {t.profile}
                   </Link>
@@ -527,13 +597,13 @@ export default function FAQPage() {
               <div className="sidebar-title">{t.support}</div>
               <ul className="sidebar-menu">
                 <li>
-                  <Link to="/help-center">
+                  <Link to="/help-center" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                     {t.helpCenter}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="active">
+                  <Link to="/faq" className="active" onClick={() => setSidebarOpen(false)}>
                     <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
                     {t.faq}
                   </Link>

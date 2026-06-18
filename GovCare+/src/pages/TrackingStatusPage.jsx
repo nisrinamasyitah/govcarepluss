@@ -230,6 +230,23 @@ html, body { margin:0; padding:0; }
 .track-page.dark .tl-actor { color:#64748b; }
 .track-page.dark .complaint-desc-text { background:#0f172a; border-color:#334155; color:#cbd5e1; }
 .track-page.dark .section-title-row { color:#f1f5f9; }
+@media (max-width:1024px) {
+  .top-nav { padding:0 20px; }
+  .page-content { padding:24px 20px; }
+}
+@media (max-width:767px) {
+  .top-nav { padding:0 16px; height:60px; }
+  .brand { font-size:17px; }
+  .nav-right { gap:8px; }
+  .lang-btn span:last-of-type { display:none; }
+  .user-info { display:none; }
+  .user-profile { padding:6px; }
+  .page-content { padding:16px; }
+  .page-header h1 { font-size:22px; }
+  .filters-bar { flex-direction:column; gap:10px; padding:16px; }
+  .filter-input { width:100%; }
+  .modal-box { width:calc(100vw - 24px); padding:20px 16px; max-height:90vh; }
+}
 `;
 
 export default function TrackingStatusPage() {
