@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, query, orderBy, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const translations = {
@@ -473,15 +473,17 @@ export default function FAQPage() {
 
   // Live FAQ listener — reads published FAQs from Firestore (updated by admin)
   useEffect(() => {
-    const q = query(
+    const faqQuery = query(
       collection(db, 'faqs'),
-      where('published', '==', true),
       orderBy('category'),
       orderBy('order')
     );
-    const unsub = onSnapshot(q, snap => {
-      if (snap.empty) { setLiveFaqs(null); return; }
-      setLiveFaqs(snap.docs.map(d => ({ ...d.data(), id: d.id })));
+    const unsub = onSnapshot(faqQuery, snap => {
+      const published = snap.docs
+        .map(d => ({ ...d.data(), id: d.id }))
+        .filter(f => f.published === true);
+      if (published.length === 0) { setLiveFaqs(null); return; }
+      setLiveFaqs(published);
       setActiveCat('all');
     }, () => setLiveFaqs(null));
     return () => unsub();
