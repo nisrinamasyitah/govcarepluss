@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
+import { collection, onSnapshot, query, orderBy, where } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 const translations = {
   en: {
@@ -450,6 +451,7 @@ export default function FAQPage() {
   const [search, setSearch] = useState('');
   const [openIdx, setOpenIdx] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [liveFaqs, setLiveFaqs] = useState(null);
 
   const langRef = useRef(null);
   const t = translations[language];
@@ -466,6 +468,22 @@ export default function FAQPage() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, user => setCurrentUser(user));
+    return () => unsub();
+  }, []);
+
+  // Live FAQ listener — reads published FAQs from Firestore (updated by admin)
+  useEffect(() => {
+    const q = query(
+      collection(db, 'faqs'),
+      where('published', '==', true),
+      orderBy('category'),
+      orderBy('order')
+    );
+    const unsub = onSnapshot(q, snap => {
+      if (snap.empty) { setLiveFaqs(null); return; }
+      setLiveFaqs(snap.docs.map(d => ({ ...d.data(), id: d.id })));
+      setActiveCat('all');
+    }, () => setLiveFaqs(null));
     return () => unsub();
   }, []);
 
@@ -494,12 +512,21 @@ export default function FAQPage() {
     navigate('/login');
   };
 
-  // Filter FAQs
-  const cats = ['all', 'complaints', 'tracking', 'account', 'privacy', 'technical'];
-  const q = search.toLowerCase();
-  const filtered = t.faqs.filter(f => {
+  // Use live Firestore FAQs if available, otherwise fall back to hardcoded translations
+  const usingLive = !!liveFaqs;
+  const srcFaqs = usingLive
+    ? liveFaqs.map((f, i) => ({ q: f.question, a: f.answer, cat: f.category, _idx: i }))
+    : t.faqs;
+
+  const liveCats = usingLive
+    ? ['all', ...Array.from(new Set(liveFaqs.map(f => f.category)))]
+    : ['all', 'complaints', 'tracking', 'account', 'privacy', 'technical'];
+  const cats = liveCats;
+
+  const sq = search.toLowerCase();
+  const filtered = srcFaqs.filter(f => {
     const catMatch = activeCat === 'all' || f.cat === activeCat;
-    const textMatch = !q || f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q);
+    const textMatch = !sq || f.q.toLowerCase().includes(sq) || f.a.toLowerCase().includes(sq);
     return catMatch && textMatch;
   });
 
@@ -645,7 +672,7 @@ export default function FAQPage() {
                   className={`cat-pill${activeCat === c ? ' active' : ''}`}
                   onClick={() => { setActiveCat(c); setOpenIdx(null); }}
                 >
-                  {c === 'all' ? t.all : (t.categories[c] || c)}
+                  {c === 'all' ? t.all : (usingLive ? c : (t.categories[c] || c))}
                 </button>
               ))}
             </div>
@@ -660,7 +687,7 @@ export default function FAQPage() {
               Object.entries(grouped).map(([cat, items]) => (
                 <div key={cat}>
                   {activeCat === 'all' && (
-                    <div className="section-label">{t.categories[cat] || cat}</div>
+                    <div className="section-label">{usingLive ? cat : (t.categories[cat] || cat)}</div>
                   )}
                   {items.map((item) => {
                     const key = `${cat}-${item._idx}`;
