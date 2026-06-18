@@ -13,7 +13,6 @@ import HelpCenterPage from './pages/HelpCenterPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import FAQPage from './pages/FAQPage';
-import EncryptionDemoPage from './pages/EncryptionDemoPage';
 
 function PrivateRoute({ user, loading, children }) {
   if (loading) return null;
@@ -49,8 +48,7 @@ export default function App() {
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
 
-        {/* Dev */}
-        <Route path="/demo/encryption" element={<EncryptionDemoPage />} />
+
       </Routes>
     </BrowserRouter>
   );
