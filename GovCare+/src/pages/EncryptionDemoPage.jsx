@@ -1,12 +1,7 @@
-import { useState } from 'react';
-import { encrypt, decrypt } from '../crypto';
-
-const DEMO_FIELDS = [
-  { label: 'Phone Number',      value: '+60 12-345 6789' },
-  { label: 'IC Number',         value: '990101-14-5678'   },
-  { label: 'Full Name',         value: 'SITI AMINAH BINTI ALI' },
-  { label: 'Home Address',      value: 'No 12, Jalan Merdeka, 50480 Kuala Lumpur' },
-];
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '../firebase';
+import { encrypt, decrypt, safeDecrypt, isEncrypted, verifyIntegrity } from '../crypto';
 
 const css = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,16 +11,16 @@ const css = `
     min-height: 100vh;
     background: #0f172a;
     color: #e2e8f0;
-    padding: 48px 24px;
+    padding: 40px 24px;
     font-family: 'Segoe UI', monospace, sans-serif;
   }
 
   .demo-header {
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 40px;
   }
   .demo-header h1 {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 800;
     color: #f1f5f9;
     margin-bottom: 10px;
@@ -33,7 +28,7 @@ const css = `
   }
   .demo-header p {
     color: #64748b;
-    font-size: 15px;
+    font-size: 14px;
     max-width: 560px;
     margin: 0 auto;
     line-height: 1.6;
@@ -45,207 +40,300 @@ const css = `
     background: rgba(99,102,241,0.15);
     border: 1px solid rgba(99,102,241,0.4);
     color: #818cf8;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     padding: 5px 12px;
     border-radius: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
 
-  .demo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+  /* Live indicator */
+  .live-bar {
     max-width: 1100px;
-    margin: 0 auto 48px;
+    margin: 0 auto 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
   }
-  @media (max-width: 700px) { .demo-grid { grid-template-columns: 1fr; } }
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #10b981;
+  }
+  .live-dot::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.3); }
+  }
+  .live-meta { font-size: 12px; color: #64748b; }
+  .live-flash { color: #34d399 !important; transition: color 0.3s; }
 
-  .panel {
-    background: #1e293b;
-    border-radius: 16px;
-    padding: 28px;
-    border: 1px solid #334155;
-  }
-  .panel-title {
+  /* Section headers */
+  .section-title {
+    max-width: 1100px;
+    margin: 32px auto 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 20px;
+    color: #475569;
+  }
+  .section-title span { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 3px 10px; color: #94a3b8; font-size: 11px; }
+
+  /* Records grid */
+  .records { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .record-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .record-card-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-  }
-  .panel-title.plain  { color: #f59e0b; }
-  .panel-title.enc    { color: #10b981; }
-  .panel-title svg    { flex-shrink: 0; }
-
-  .field-row {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #0f172a;
     border-bottom: 1px solid #334155;
+    font-size: 12px;
   }
-  .field-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-  .field-label {
-    font-size: 11px;
-    color: #94a3b8;
-    font-weight: 600;
+  .record-uid { color: #475569; font-family: 'Courier New', monospace; }
+  .record-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
   }
-  .field-value {
-    font-size: 14px;
+  .tag-user { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+  .tag-complaint { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+
+  .record-fields { display: flex; flex-direction: column; }
+  .field-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr;
+    border-bottom: 1px solid #1e293b;
+    font-size: 12px;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-name {
+    padding: 10px 14px;
+    color: #475569;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: #0f172a;
+    font-size: 10px;
+    border-right: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+  }
+  .field-plain {
+    padding: 10px 14px;
+    color: #fbbf24;
     font-family: 'Courier New', monospace;
     word-break: break-all;
     line-height: 1.5;
+    border-right: 1px solid #1e293b;
   }
-  .field-value.plain-val { color: #fbbf24; }
-  .field-value.enc-val   { color: #34d399; font-size: 12px; }
+  .field-stored {
+    padding: 10px 14px;
+    color: #34d399;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+    line-height: 1.5;
+    font-size: 11px;
+  }
+  .field-stored.no-enc { color: #475569; font-style: italic; }
+  .col-header {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+  }
+  .col-header-cell {
+    padding: 8px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-right: 1px solid #1e293b;
+  }
+  .col-header-cell:last-child { border-right: none; }
+  .col-header-cell.plain-hdr  { color: #f59e0b; }
+  .col-header-cell.stored-hdr { color: #10b981; }
+  .col-header-cell.field-hdr  { color: #475569; }
 
-  .arrow-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 0 8px;
-  }
-  .arrow-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  /* Integrity badge */
+  .integrity-ok  { color: #10b981; font-size: 11px; font-weight: 700; }
+  .integrity-fail { color: #ef4444; font-size: 11px; font-weight: 700; }
+  .integrity-na  { color: #475569; font-size: 11px; }
+
+  /* Empty / loading states */
+  .empty-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
     color: #475569;
-    font-size: 22px;
+    font-size: 13px;
   }
+  .loading-row { display: flex; align-items: center; justify-content: center; gap: 10px; color: #475569; font-size: 13px; }
+  .spinner { width: 16px; height: 16px; border: 2px solid #334155; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  .demo-input-section {
+  /* Custom sandbox */
+  .sandbox {
     max-width: 560px;
-    margin: 0 auto 48px;
+    margin: 40px auto 0;
     background: #1e293b;
     border-radius: 16px;
     padding: 28px;
     border: 1px solid #334155;
   }
-  .demo-input-section h2 {
-    font-size: 16px;
-    font-weight: 700;
-    color: #f1f5f9;
-    margin-bottom: 16px;
-  }
+  .sandbox h2 { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; }
   .input-row { display: flex; gap: 12px; }
   .demo-input {
-    flex: 1;
-    background: #0f172a;
-    border: 1.5px solid #334155;
-    border-radius: 10px;
-    padding: 12px 16px;
-    color: #f1f5f9;
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s;
+    flex: 1; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px;
+    padding: 11px 14px; color: #f1f5f9; font-size: 14px; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
   }
   .demo-input:focus { border-color: #6366f1; }
   .demo-input::placeholder { color: #475569; }
   .btn-encrypt {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: opacity 0.2s;
-    font-family: inherit;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none;
+    border-radius: 10px; padding: 11px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: opacity 0.2s; font-family: inherit;
   }
   .btn-encrypt:hover { opacity: 0.85; }
   .btn-encrypt:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .result-box {
-    margin-top: 16px;
-    background: #0f172a;
-    border-radius: 10px;
-    padding: 16px;
-    border: 1px solid #334155;
-    display: none;
-  }
-  .result-box.show { display: block; }
-  .result-row { margin-bottom: 12px; }
-  .result-row:last-child { margin-bottom: 0; }
-  .result-key { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+  .result-box { margin-top: 14px; display: none; flex-direction: column; gap: 10px; }
+  .result-box.show { display: flex; }
+  .result-row {}
+  .result-key { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
   .result-val {
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    word-break: break-all;
-    line-height: 1.5;
-    padding: 8px 12px;
-    border-radius: 6px;
+    font-size: 12px; font-family: 'Courier New', monospace; word-break: break-all;
+    line-height: 1.5; padding: 8px 12px; border-radius: 6px;
   }
-  .result-val.plain-bg { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-  .result-val.enc-bg   { background: rgba(52,211,153,0.1); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
-  .result-val.dec-bg   { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+  .plain-bg  { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+  .enc-bg    { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+  .dec-bg    { background: rgba(99,102,241,0.1);  color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
 
-  .legend {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
+  @media (max-width: 767px) {
+    .field-row { grid-template-columns: 90px 1fr; }
+    .col-header { grid-template-columns: 90px 1fr; }
+    .field-stored { display: none; }
+    .col-header-cell.stored-hdr { display: none; }
+    .field-row .field-plain { border-right: none; }
   }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 13px;
-    color: #94a3b8;
-  }
-  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .dot-yellow { background: #f59e0b; }
-  .dot-green  { background: #10b981; }
-  .dot-indigo { background: #6366f1; }
-
-  .firestore-note {
-    max-width: 1100px;
-    margin: 32px auto 0;
-    background: rgba(16,185,129,0.08);
-    border: 1px solid rgba(16,185,129,0.25);
-    border-radius: 12px;
-    padding: 20px 24px;
-    color: #6ee7b7;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  .firestore-note strong { color: #34d399; }
 `;
 
 export default function EncryptionDemoPage() {
-  const [rows, setRows] = useState(
-    DEMO_FIELDS.map(f => ({ ...f, encrypted: null, loading: false }))
-  );
-  const [customText, setCustomText] = useState('');
+  const [users, setUsers]           = useState(null);   // null = loading
+  const [complaints, setComplaints] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [flash, setFlash]           = useState(false);
+
+  // Custom sandbox
+  const [customText, setCustomText]   = useState('');
   const [customResult, setCustomResult] = useState(null);
   const [customLoading, setCustomLoading] = useState(false);
 
-  async function encryptAll() {
-    const updated = await Promise.all(
-      rows.map(async row => {
-        const encrypted = await encrypt(row.value);
-        return { ...row, encrypted };
-      })
-    );
-    setRows(updated);
+  function triggerFlash() {
+    setLastUpdated(new Date());
+    setFlash(true);
+    setTimeout(() => setFlash(false), 1200);
   }
+
+  // Decrypt all PII fields for display
+  async function processUser(doc) {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      fullName:  { raw: d.fullName  ?? '—', plain: await safeDecrypt(d.fullName  ?? '') || '—' },
+      email:     { raw: d.email     ?? '—', plain: await safeDecrypt(d.email     ?? '') || '—' },
+      phone:     { raw: d.phone     ?? '—', plain: await safeDecrypt(d.phone     ?? '') || '—' },
+      icNumber:  { raw: d.icNumber  ?? '—', plain: await safeDecrypt(d.icNumber  ?? '') || '—' },
+      createdAt: d.createdAt ?? '—',
+    };
+  }
+
+  async function processComplaint(doc) {
+    const d = doc.data();
+    const plainTitle  = await safeDecrypt(d.title        ?? '') || '—';
+    const plainDesc   = await safeDecrypt(d.description  ?? '') || '—';
+    const plainName   = await safeDecrypt(d.citizenName  ?? '') || '—';
+    const plainEmail  = await safeDecrypt(d.citizenEmail ?? '') || '—';
+
+    let integrity = null;
+    if (d._integrity) {
+      const payload = {
+        citizenEmail: plainEmail, citizenId: d.citizenId || '',
+        citizenName:  plainName,  date:      d.date      || '',
+        description:  plainDesc,  id:        d.id        || '',
+        ministry:     d.ministry  || '', priority: d.priority || '',
+        title:        plainTitle,
+      };
+      integrity = await verifyIntegrity(payload, d._integrity);
+    }
+
+    return {
+      id: doc.id,
+      cid: d.id ?? doc.id,
+      title:        { raw: d.title        ?? '—', plain: plainTitle },
+      description:  { raw: d.description  ?? '—', plain: plainDesc  },
+      citizenName:  { raw: d.citizenName  ?? '—', plain: plainName  },
+      citizenEmail: { raw: d.citizenEmail ?? '—', plain: plainEmail },
+      ministry:  d.ministry  ?? '—',
+      status:    d.status    ?? '—',
+      priority:  d.priority  ?? '—',
+      integrity,
+      hasHmac: !!d._integrity,
+    };
+  }
+
+  useEffect(() => {
+    const qUsers = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(15));
+    const unsubUsers = onSnapshot(qUsers, async snap => {
+      const processed = await Promise.all(snap.docs.map(processUser));
+      setUsers(processed);
+      triggerFlash();
+    }, () => setUsers([]));
+
+    const qComplaints = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'), limit(15));
+    const unsubComplaints = onSnapshot(qComplaints, async snap => {
+      const processed = await Promise.all(snap.docs.map(processComplaint));
+      setComplaints(processed);
+      triggerFlash();
+    }, () => setComplaints([]));
+
+    return () => { unsubUsers(); unsubComplaints(); };
+  }, []);
 
   async function handleCustom() {
     if (!customText.trim()) return;
@@ -256,7 +344,7 @@ export default function EncryptionDemoPage() {
     setCustomLoading(false);
   }
 
-  const allEncrypted = rows.every(r => r.encrypted);
+  const totalRecords = (users?.length ?? 0) + (complaints?.length ?? 0);
 
   return (
     <>
@@ -269,67 +357,138 @@ export default function EncryptionDemoPage() {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
-            AES-256-GCM · PBKDF2 · Web Crypto API
+            AES-256-GCM · PBKDF2 · Live Firebase Data
           </div>
-          <h1>Encryption Demo</h1>
+          <h1>Encryption Live View</h1>
           <p>
-            This shows the difference between what a user types (plaintext) and what is
-            actually stored in Firestore (AES-256-GCM encrypted). The raw database never
-            sees sensitive values.
+            Real data from Firestore — auto-updates whenever a new user registers or complaint is submitted.
+            Left column shows plaintext (decrypted in-browser). Right column shows what is physically stored.
           </p>
         </div>
 
-        {/* Side-by-side panels */}
-        {!allEncrypted ? (
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <button className="btn-encrypt" onClick={encryptAll}>
-              🔒 &nbsp; Encrypt all fields — see what Firestore stores
-            </button>
+        {/* Live bar */}
+        <div className="live-bar">
+          <div className="live-dot">Live — Firebase onSnapshot</div>
+          <div className={`live-meta ${flash ? 'live-flash' : ''}`}>
+            {lastUpdated
+              ? `Last updated: ${lastUpdated.toLocaleTimeString('en-MY')}  ·  ${totalRecords} records`
+              : 'Connecting to Firebase…'}
           </div>
-        ) : null}
+        </div>
 
-        <div className="demo-grid">
-          {/* Plaintext panel */}
-          <div className="panel">
-            <div className="panel-title plain">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-              Plaintext — visible to anyone with DB access
-            </div>
-            {rows.map(row => (
-              <div className="field-row" key={row.label}>
-                <div className="field-label">{row.label}</div>
-                <div className="field-value plain-val">{row.value}</div>
-              </div>
-            ))}
-          </div>
+        {/* ── USERS ── */}
+        <div className="section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+          Collection: users
+          <span>{users === null ? '…' : users.length}</span>
+        </div>
 
-          {/* Encrypted panel */}
-          <div className="panel">
-            <div className="panel-title enc">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-              Encrypted — what is actually stored in Firestore
-            </div>
-            {rows.map(row => (
-              <div className="field-row" key={row.label}>
-                <div className="field-label">{row.label}</div>
-                <div className="field-value enc-val">
-                  {row.encrypted ?? (
-                    <span style={{ color: '#475569', fontStyle: 'italic' }}>
-                      Click "Encrypt all fields" above ↑
-                    </span>
-                  )}
+        {users === null ? (
+          <div className="empty-card"><div className="loading-row"><div className="spinner"/>Loading users…</div></div>
+        ) : users.length === 0 ? (
+          <div className="empty-card">No users registered yet.</div>
+        ) : (
+          <div className="records">
+            {users.map(u => (
+              <div className="record-card" key={u.id}>
+                <div className="record-card-header">
+                  <span className="record-uid">UID: {u.id}</span>
+                  <span className="record-tag tag-user">User</span>
+                </div>
+                <div className="col-header">
+                  <div className="col-header-cell field-hdr">Field</div>
+                  <div className="col-header-cell plain-hdr">Plaintext (browser decrypts)</div>
+                  <div className="col-header-cell stored-hdr">Stored in Firestore (ciphertext)</div>
+                </div>
+                <div className="record-fields">
+                  {[
+                    { name: 'fullName',  f: u.fullName  },
+                    { name: 'email',     f: u.email     },
+                    { name: 'phone',     f: u.phone     },
+                    { name: 'icNumber',  f: u.icNumber  },
+                  ].map(({ name, f }) => (
+                    <div className="field-row" key={name}>
+                      <div className="field-name">{name}</div>
+                      <div className="field-plain">{f.plain}</div>
+                      <div className={`field-stored${isEncrypted(f.raw) ? '' : ' no-enc'}`}>
+                        {isEncrypted(f.raw) ? f.raw : '(not encrypted)'}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="field-row">
+                    <div className="field-name">createdAt</div>
+                    <div className="field-plain" style={{ color: '#94a3b8' }}>{String(u.createdAt)}</div>
+                    <div className="field-stored no-enc">(plaintext — not PII)</div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+        )}
+
+        {/* ── COMPLAINTS ── */}
+        <div className="section-title" style={{ marginTop: 40 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Collection: complaints
+          <span>{complaints === null ? '…' : complaints.length}</span>
         </div>
 
-        {/* Try your own */}
-        <div className="demo-input-section">
+        {complaints === null ? (
+          <div className="empty-card"><div className="loading-row"><div className="spinner"/>Loading complaints…</div></div>
+        ) : complaints.length === 0 ? (
+          <div className="empty-card">No complaints submitted yet.</div>
+        ) : (
+          <div className="records">
+            {complaints.map(c => (
+              <div className="record-card" key={c.id}>
+                <div className="record-card-header">
+                  <span className="record-uid">ID: {c.cid}  ·  {c.ministry}  ·  {c.status}</span>
+                  <span className="record-tag tag-complaint">Complaint</span>
+                </div>
+                <div className="col-header">
+                  <div className="col-header-cell field-hdr">Field</div>
+                  <div className="col-header-cell plain-hdr">Plaintext (browser decrypts)</div>
+                  <div className="col-header-cell stored-hdr">Stored in Firestore (ciphertext)</div>
+                </div>
+                <div className="record-fields">
+                  {[
+                    { name: 'citizenName',  f: c.citizenName  },
+                    { name: 'citizenEmail', f: c.citizenEmail },
+                    { name: 'title',        f: c.title        },
+                    { name: 'description',  f: c.description  },
+                  ].map(({ name, f }) => (
+                    <div className="field-row" key={name}>
+                      <div className="field-name">{name}</div>
+                      <div className="field-plain">{f.plain}</div>
+                      <div className={`field-stored${isEncrypted(f.raw) ? '' : ' no-enc'}`}>
+                        {isEncrypted(f.raw) ? f.raw : '(not encrypted)'}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="field-row">
+                    <div className="field-name">_integrity</div>
+                    <div className="field-plain">
+                      {!c.hasHmac
+                        ? <span className="integrity-na">n/a — submitted before HMAC was added</span>
+                        : c.integrity === true
+                          ? <span className="integrity-ok">✓ VERIFIED — no tampering detected</span>
+                          : <span className="integrity-fail">⚠ MISMATCH — data may have been altered</span>
+                      }
+                    </div>
+                    <div className="field-stored no-enc">(HMAC-SHA256 signature)</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── Sandbox ── */}
+        <div className="sandbox">
           <h2>Try encrypting your own value</h2>
           <div className="input-row">
             <input
@@ -360,28 +519,12 @@ export default function EncryptionDemoPage() {
                   <div className="result-val enc-bg">{customResult.encrypted}</div>
                 </div>
                 <div className="result-row">
-                  <div className="result-key">Decrypted back (what the user sees)</div>
+                  <div className="result-key">Decrypted back (browser only)</div>
                   <div className="result-val dec-bg">{customResult.decrypted}</div>
                 </div>
               </>
             )}
           </div>
-        </div>
-
-        {/* Legend */}
-        <div className="legend">
-          <div className="legend-item"><div className="dot dot-yellow" /> Plaintext — readable by anyone</div>
-          <div className="legend-item"><div className="dot dot-green"  /> Encrypted — stored in Firestore (starts with <code style={{color:'#34d399'}}>enc:</code>)</div>
-          <div className="legend-item"><div className="dot dot-indigo" /> Decrypted — shown to the authorised user only</div>
-        </div>
-
-        {/* Firestore note */}
-        <div className="firestore-note">
-          <strong>How it works:</strong> When a user saves their phone number or IC, the app encrypts
-          it with <strong>AES-256-GCM</strong> (key derived via PBKDF2 / SHA-256, 100,000 iterations)
-          before the value ever leaves the browser. Firestore only ever receives the <code>enc:…</code> string.
-          When the user opens their profile, the app fetches the encrypted string and decrypts it
-          locally — the server never sees the plaintext.
         </div>
 
       </div>
