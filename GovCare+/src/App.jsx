@@ -16,7 +16,7 @@ import FAQPage from './pages/FAQPage';
 
 function PrivateRoute({ user, loading, children }) {
   if (loading) return null;
-  return user ? children : <Navigate to="/login" replace />;
+  return user ? children : <Navigate to="/" replace />;
 }
 
 export default function App() {
