@@ -479,20 +479,20 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(auth, user => {
-      setCurrentUser(user);
+    let unsubLogs = null;
+    let unsubC    = null;
+
+    function startListeners(user) {
       if (!user) { setLoading(false); setComplaints([]); return; }
 
-      // Activity logs (not encrypted — direct Firestore read is fine)
       const qLogs = query(collection(db, 'activityLogs'), where('userId', '==', user.uid));
-      const unsubLogs = onSnapshot(qLogs, snap => {
+      unsubLogs = onSnapshot(qLogs, snap => {
         setActivityLogs(snap.docs.map(d => ({ docId: d.id, ...d.data() }))
           .sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0)));
       });
 
-      // Real-time complaints — decrypt each document client-side
       const qC = query(collection(db, 'complaints'), where('citizenId', '==', user.uid));
-      const unsubC = onSnapshot(qC, async snap => {
+      unsubC = onSnapshot(qC, async snap => {
         const data = await Promise.all(snap.docs.map(async d => {
           const raw = d.data();
           const dec = await decryptFields(raw, ['title', 'description', 'citizenName', 'citizenEmail']);
@@ -539,10 +539,26 @@ export default function DashboardPage() {
         setNotifications(notifs.map(n => ({ ...n, unread: !savedReadIds.includes(n.id) })).slice(0, 10));
         setLoading(false);
       });
+    }
 
-      return () => { unsubLogs(); unsubC(); };
+    // Start immediately if the session is already active (avoids waiting for onAuthStateChanged)
+    if (auth.currentUser) {
+      setCurrentUser(auth.currentUser);
+      startListeners(auth.currentUser);
+    }
+
+    // onAuthStateChanged handles login/logout after initial render
+    const unsubAuth = onAuthStateChanged(auth, user => {
+      setCurrentUser(user);
+      if (!auth.currentUser) {
+        // Auth just resolved for the first time — start listeners now
+        unsubLogs?.();
+        unsubC?.();
+        startListeners(user);
+      }
     });
-    return () => unsubAuth();
+
+    return () => { unsubAuth(); unsubLogs?.(); unsubC?.(); };
   }, []);
 
   // Close dropdowns on outside click
