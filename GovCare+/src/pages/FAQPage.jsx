@@ -515,7 +515,7 @@ export default function FAQPage() {
 
   const handleLogout = async () => {
     await signOut(auth);
-    navigate('/login');
+    navigate('/');
   };
 
   // Use live Firestore FAQs if available, otherwise fall back to hardcoded translations
