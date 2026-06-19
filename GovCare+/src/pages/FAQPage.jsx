@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const translations = {
@@ -162,6 +162,12 @@ const translations = {
   }
 };
 
+const notifIconMap = {
+  success: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+  info:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
+  warning: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+};
+
 const langMeta = {
   en: { flag: '🇬🇧', label: 'EN' },
   ms: { flag: '🇲🇾', label: 'BM' },
@@ -227,6 +233,49 @@ const css = `
   .faq-page.dark .lang-option { color: #e2e8f0; }
   .faq-page.dark .lang-option:hover { background: #334155; }
   .faq-page.dark .lang-option.active { background: #312e81; color: #a5b4fc; }
+
+  /* Notification bell */
+  .notification-wrapper { position: relative; }
+  .notif-icon { position: relative; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.2s; color: #374151; }
+  .notif-icon:hover { background: #f3f4f6; }
+  .faq-page.dark .notif-icon { color: #e2e8f0; }
+  .faq-page.dark .notif-icon:hover { background: #334155; }
+  .notif-badge { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid white; }
+  .faq-page.dark .notif-badge { border-color: #0f172a; }
+  .notif-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 380px; background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; }
+  .notif-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+  .faq-page.dark .notif-dropdown { background: #1e293b; border-color: #334155; }
+  .notif-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e5e7eb; }
+  .faq-page.dark .notif-header { border-color: #334155; }
+  .notif-header h3 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .faq-page.dark .notif-header h3 { color: #f1f5f9; }
+  .notif-header span { font-size: 12px; color: #090088; cursor: pointer; font-weight: 600; }
+  .faq-page.dark .notif-header span { color: #818cf8; }
+  .notif-header span:hover { text-decoration: underline; }
+  .notif-list { max-height: 400px; overflow-y: auto; }
+  .notif-item { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 12px; cursor: pointer; transition: background 0.2s; align-items: flex-start; }
+  .notif-item:hover { background: #f9fafb; }
+  .notif-item.unread { background: #f0f9ff; }
+  .notif-item.unread:hover { background: #e0f2fe; }
+  .faq-page.dark .notif-item { border-color: #334155; }
+  .faq-page.dark .notif-item:hover { background: #334155; }
+  .faq-page.dark .notif-item.unread { background: #1e3a5f; }
+  .notif-item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notif-item-icon.success { background: #d1fae5; color: #059669; }
+  .notif-item-icon.info { background: #dbeafe; color: #2563eb; }
+  .notif-item-icon.warning { background: #fef3c7; color: #d97706; }
+  .notif-item-content { flex: 1; min-width: 0; }
+  .notif-item-title { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .faq-page.dark .notif-item-title { color: #f1f5f9; }
+  .notif-item-text { font-size: 12px; color: #6b7280; line-height: 1.4; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .faq-page.dark .notif-item-text { color: #94a3b8; }
+  .notif-item-time { font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+  .unread-dot { width: 8px; height: 8px; background: #090088; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .notif-footer { padding: 12px 20px; text-align: center; border-top: 1px solid #e5e7eb; }
+  .faq-page.dark .notif-footer { border-color: #334155; }
+  .notif-footer a { font-size: 13px; color: #090088; font-weight: 600; text-decoration: none; }
+  .faq-page.dark .notif-footer a { color: #818cf8; }
+  .notif-footer a:hover { text-decoration: underline; }
 
   .user-profile {
     display: flex; align-items: center; gap: 12px; cursor: pointer;
@@ -457,7 +506,10 @@ export default function FAQPage() {
   const [liveFaqs, setLiveFaqs]       = useState(null);
   const [faqLoading, setFaqLoading]   = useState(true);
 
-  const langRef = useRef(null);
+  const [notifOpen, setNotifOpen]     = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const langRef  = useRef(null);
+  const notifRef = useRef(null);
   const t = translations[language];
   const meta = langMeta[language];
 
@@ -471,8 +523,33 @@ export default function FAQPage() {
   }, []);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, user => setCurrentUser(user));
-    return () => unsub();
+    const unsubAuth = onAuthStateChanged(auth, user => {
+      if (!user) return;
+      setCurrentUser(user);
+      const q = query(collection(db, 'complaints'), where('citizenId', '==', user.uid));
+      const unsubSnap = onSnapshot(q, snap => {
+        const readIds = JSON.parse(localStorage.getItem('govcare-read-notifs') || '[]');
+        const timeAgo = d => {
+          if (!d) return '';
+          const days = Math.floor((new Date() - new Date(d)) / 86400000);
+          return days === 0 ? 'Today' : days === 1 ? '1 day ago' : `${days} days ago`;
+        };
+        const notifs = snap.docs.map(doc => {
+          const c = { docId: doc.id, ...doc.data() };
+          let type = 'info', title = '', text = '';
+          if (c.status === 'Resolved')       { type='success'; title='Complaint Resolved';    text=`Your complaint ${c.id} has been resolved successfully.`; }
+          else if (c.status === 'In Progress') { type='info';    title='Complaint In Progress'; text=`${c.ministryLabel||c.ministry} is working on complaint ${c.id}.`; }
+          else if (c.status === 'Pending Review') { type='warning'; title='Under Review';     text=`Complaint ${c.id} is being reviewed by ${c.ministryLabel||c.ministry}.`; }
+          else if (c.status === 'Rejected')  { type='warning';  title='Complaint Rejected';  text=`Your complaint ${c.id} could not be processed.`; }
+          else { type='info'; title='Complaint Submitted'; text=`Your complaint ${c.id} has been received and is awaiting review.`; }
+          return { id: `${c.docId}-${c.status}`, type, title, text, time: timeAgo(c.date), unread: !readIds.includes(`${c.docId}-${c.status}`) };
+        });
+        notifs.sort((a, b) => b.unread - a.unread);
+        setNotifications(notifs.slice(0, 10));
+      });
+      return () => unsubSnap();
+    });
+    return () => unsubAuth();
   }, []);
 
   // Live FAQ listener — reads published FAQs from Firestore (managed by admin in FAQ Management)
@@ -500,6 +577,7 @@ export default function FAQPage() {
   useEffect(() => {
     const handler = e => {
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -509,6 +587,14 @@ export default function FAQPage() {
     const next = !darkMode;
     setDarkMode(next);
     localStorage.setItem('govcare-theme', next ? 'dark' : 'light');
+  };
+
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  const markAllRead = () => {
+    const ids = notifications.map(n => n.id);
+    localStorage.setItem('govcare-read-notifs', JSON.stringify(ids));
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   };
 
   const handleLang = (lang) => {
@@ -555,32 +641,85 @@ export default function FAQPage() {
             </Link>
           </div>
           <div className="nav-right">
-            <button className="theme-toggle" onClick={toggleDark} title="Toggle theme">
+            {/* Theme Toggle — same icon as Help Center */}
+            <button className="theme-toggle" onClick={toggleDark} title="Toggle Dark/Light Mode">
               {darkMode ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 110-12 6 6 0 010 12zm0-2a4 4 0 100-8 4 4 0 000 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-7 9a7 7 0 017-7v14a7 7 0 01-7-7z"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
               )}
             </button>
 
+            {/* Language */}
             <div className="language-wrapper" ref={langRef}>
-              <button className="language-btn" onClick={() => setLangOpen(o => !o)}>
+              <div className="language-btn" onClick={() => { setLangOpen(o => !o); setNotifOpen(false); }}>
                 <span>{meta.flag}</span><span>{meta.label}</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
-              </button>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
               <div className={`lang-dropdown${langOpen ? ' open' : ''}`}>
                 {Object.entries(langMeta).map(([code, m]) => (
                   <div key={code} className={`lang-option${language === code ? ' active' : ''}`} onClick={() => handleLang(code)}>
                     <span>{m.flag}</span><span>{m.label}</span>
-                    {language === code && <span className="check">✓</span>}
+                    {language === code && <svg className="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>}
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Notifications */}
+            <div className="notification-wrapper" ref={notifRef}>
+              <div className="notif-icon" onClick={() => { setNotifOpen(o => !o); setLangOpen(false); }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                {unreadCount > 0 && <div className="notif-badge"></div>}
+              </div>
+              <div className={`notif-dropdown${notifOpen ? ' open' : ''}`}>
+                <div className="notif-header">
+                  <h3>{t.notifications}</h3>
+                  <span onClick={markAllRead}>{t.markAllRead}</span>
+                </div>
+                <div className="notif-list">
+                  {notifications.length === 0 ? (
+                    <div style={{textAlign:'center',padding:'24px 16px',color:'#9ca3af',fontSize:'13px'}}>No notifications yet</div>
+                  ) : notifications.map(n => (
+                    <div key={n.id} className={`notif-item${n.unread ? ' unread' : ''}`} onClick={() => {
+                      const existing = JSON.parse(localStorage.getItem('govcare-read-notifs') || '[]');
+                      localStorage.setItem('govcare-read-notifs', JSON.stringify([...new Set([...existing, n.id])]));
+                      setNotifications(prev => prev.map(x => x.id === n.id ? {...x, unread: false} : x));
+                      navigate('/track-status');
+                    }}>
+                      <div className={`notif-item-icon ${n.type}`}>{notifIconMap[n.type]}</div>
+                      <div className="notif-item-content">
+                        <div className="notif-item-title">{n.title}</div>
+                        <div className="notif-item-text">{n.text}</div>
+                        <div className="notif-item-time">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          {n.time}
+                        </div>
+                      </div>
+                      {n.unread && <div className="unread-dot"></div>}
+                    </div>
+                  ))}
+                </div>
+                <div className="notif-footer">
+                  <Link to="/track-status">{t.viewAllNotifications}</Link>
+                </div>
+              </div>
+            </div>
+
+            {/* User Profile */}
             <Link to="/profile" className="user-profile">
               <div className="user-avatar">{initials}</div>
-              <div>
+              <div className="user-info">
                 <div className="user-name">{displayName}</div>
                 <div className="user-email">{email}</div>
               </div>
