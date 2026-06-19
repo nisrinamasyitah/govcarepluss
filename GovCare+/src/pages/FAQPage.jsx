@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const translations = {
@@ -471,21 +471,25 @@ export default function FAQPage() {
     return () => unsub();
   }, []);
 
-  // Live FAQ listener — reads published FAQs from Firestore (updated by admin)
+  // Live FAQ listener — reads published FAQs from Firestore (set by admin in FAQ Management)
   useEffect(() => {
-    const faqQuery = query(
-      collection(db, 'faqs'),
-      orderBy('category'),
-      orderBy('order')
-    );
-    const unsub = onSnapshot(faqQuery, snap => {
+    // No orderBy — avoids needing a Firestore composite index; sort client-side instead
+    const unsub = onSnapshot(query(collection(db, 'faqs')), snap => {
       const published = snap.docs
         .map(d => ({ ...d.data(), id: d.id }))
-        .filter(f => f.published === true);
+        .filter(f => f.published === true)
+        .sort((a, b) => {
+          if ((a.category || '') < (b.category || '')) return -1;
+          if ((a.category || '') > (b.category || '')) return 1;
+          return (a.order || 0) - (b.order || 0);
+        });
       if (published.length === 0) { setLiveFaqs(null); return; }
       setLiveFaqs(published);
       setActiveCat('all');
-    }, () => setLiveFaqs(null));
+    }, err => {
+      console.error('FAQ Firestore error:', err);
+      setLiveFaqs(null);
+    });
     return () => unsub();
   }, []);
 

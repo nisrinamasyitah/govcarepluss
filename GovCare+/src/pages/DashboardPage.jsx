@@ -481,8 +481,11 @@ export default function DashboardPage() {
   useEffect(() => {
     let unsubLogs = null;
     let unsubC    = null;
+    let started   = false;   // guard — prevents double-setup if currentUser + onAuthStateChanged both fire
 
     function startListeners(user) {
+      if (started) return;
+      started = true;
       if (!user) { setLoading(false); setComplaints([]); return; }
 
       const qLogs = query(collection(db, 'activityLogs'), where('userId', '==', user.uid));
@@ -547,15 +550,10 @@ export default function DashboardPage() {
       startListeners(auth.currentUser);
     }
 
-    // onAuthStateChanged handles login/logout after initial render
+    // Fallback: if currentUser wasn't available yet, onAuthStateChanged will start listeners
     const unsubAuth = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
-      if (!auth.currentUser) {
-        // Auth just resolved for the first time — start listeners now
-        unsubLogs?.();
-        unsubC?.();
-        startListeners(user);
-      }
+      startListeners(user); // no-op if already started via auth.currentUser above
     });
 
     return () => { unsubAuth(); unsubLogs?.(); unsubC?.(); };
