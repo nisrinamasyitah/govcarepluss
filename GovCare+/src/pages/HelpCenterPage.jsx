@@ -8,7 +8,7 @@ const translations = {
   en: {
     menu: 'Menu', home: 'Home', submitComplaint: 'Submit Complaint',
     trackStatus: 'Track Status', profile: 'Profile',
-    support: 'Support', helpCenter: 'Help Center', logout: 'Logout',
+    support: 'Support', helpCenter: 'Help Center', faq: 'FAQ', logout: 'Logout',
     notifications: 'Notifications', markAllRead: 'Mark all as read',
     viewAllNotifications: 'View all notifications',
     helpCenterTitle: 'Help Center',
@@ -31,7 +31,7 @@ const translations = {
   ms: {
     menu: 'Menu', home: 'Utama', submitComplaint: 'Hantar Aduan',
     trackStatus: 'Jejak Status', profile: 'Profil',
-    support: 'Sokongan', helpCenter: 'Pusat Bantuan', logout: 'Log Keluar',
+    support: 'Sokongan', helpCenter: 'Pusat Bantuan', faq: 'Soalan Lazim', logout: 'Log Keluar',
     notifications: 'Pemberitahuan', markAllRead: 'Tandakan semua dibaca',
     viewAllNotifications: 'Lihat semua pemberitahuan',
     helpCenterTitle: 'Pusat Bantuan',
@@ -54,7 +54,7 @@ const translations = {
   zh: {
     menu: '菜单', home: '首页', submitComplaint: '提交投诉',
     trackStatus: '跟踪状态', profile: '个人资料',
-    support: '支持', helpCenter: '帮助中心', logout: '登出',
+    support: '支持', helpCenter: '帮助中心', faq: '常见问题', logout: '登出',
     notifications: '通知', markAllRead: '全部标为已读',
     viewAllNotifications: '查看所有通知',
     helpCenterTitle: '帮助中心',
@@ -77,7 +77,7 @@ const translations = {
   ta: {
     menu: 'மெனு', home: 'முகப்பு', submitComplaint: 'புகார் சமர்ப்பி',
     trackStatus: 'நிலையை கண்காணி', profile: 'சுயவிவரம்',
-    support: 'ஆதரவு', helpCenter: 'உதவி மையம்', logout: 'வெளியேறு',
+    support: 'ஆதரவு', helpCenter: 'உதவி மையம்', faq: 'அடிக்கடி கேட்கும் கேள்விகள்', logout: 'வெளியேறு',
     notifications: 'அறிவிப்புகள்', markAllRead: 'அனைத்தையும் படித்ததாக குறி',
     viewAllNotifications: 'அனைத்து அறிவிப்புகளையும் காண்க',
     helpCenterTitle: 'உதவி மையம்',
@@ -730,8 +730,8 @@ export default function HelpCenterPage() {
                 </li>
                 <li>
                   <Link to="/faq" onClick={() => setSidebarOpen(false)}>
-                    <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
-                    FAQ
+                    <span className="menu-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 9h8"/><path d="M8 13h5"/><path d="M12 17v.01"/></svg></span>
+                    {t.faq}
                   </Link>
                 </li>
                 <li>
