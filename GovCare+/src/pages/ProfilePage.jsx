@@ -284,7 +284,7 @@ export default function ProfilePage() {
 
     // Listen to auth state, then load Firestore user profile
     const unsubAuth = onAuthStateChanged(auth, async user => {
-      if (!user) { navigate('/login'); return; }
+      if (!user) { navigate('/'); return; }
       setCurrentUser(user);
       setDisplayName(user.displayName || '');
       setEmail(user.email || '');
