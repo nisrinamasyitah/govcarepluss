@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +25,10 @@ jobs:
         working-directory: GovCare+
         run: npm run build
 
-      - name: Deploy to Firebase Hosting
-        working-directory: GovCare+
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          npx firebase-tools@latest deploy --only hosting --project govcarepluss
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOVCAREPLUSS }}
+          channelId: live
+          projectId: govcarepluss
+          entryPoint: GovCare+
