@@ -448,10 +448,10 @@ export default function HelpCenterPage() {
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(query(collection(db, 'faqs')), snap => {
+    const faqQuery = query(collection(db, 'faqs'), where('published', '==', true));
+    const unsub = onSnapshot(faqQuery, snap => {
       const published = snap.docs
         .map(d => ({ ...d.data(), id: d.id }))
-        .filter(f => f.published === true)
         .sort((a, b) => {
           if ((a.category || '') < (b.category || '')) return -1;
           if ((a.category || '') > (b.category || '')) return 1;
