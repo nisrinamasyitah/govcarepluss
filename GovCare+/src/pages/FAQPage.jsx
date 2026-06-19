@@ -360,6 +360,7 @@ const css = `
   .no-results { text-align: center; padding: 60px 24px; color: #9ca3af; }
   .no-results svg { margin: 0 auto 12px; display: block; opacity: 0.35; }
   .no-results p { font-size: 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Contact Bar */
   .contact-bar {
@@ -451,7 +452,8 @@ export default function FAQPage() {
   const [search, setSearch] = useState('');
   const [openIdx, setOpenIdx] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [liveFaqs, setLiveFaqs] = useState(null);
+  const [liveFaqs, setLiveFaqs]       = useState(null);
+  const [faqLoading, setFaqLoading]   = useState(true);
 
   const langRef = useRef(null);
   const t = translations[language];
@@ -471,9 +473,8 @@ export default function FAQPage() {
     return () => unsub();
   }, []);
 
-  // Live FAQ listener — reads published FAQs from Firestore (set by admin in FAQ Management)
+  // Live FAQ listener — reads published FAQs from Firestore (managed by admin in FAQ Management)
   useEffect(() => {
-    // No orderBy — avoids needing a Firestore composite index; sort client-side instead
     const unsub = onSnapshot(query(collection(db, 'faqs')), snap => {
       const published = snap.docs
         .map(d => ({ ...d.data(), id: d.id }))
@@ -483,12 +484,13 @@ export default function FAQPage() {
           if ((a.category || '') > (b.category || '')) return 1;
           return (a.order || 0) - (b.order || 0);
         });
-      if (published.length === 0) { setLiveFaqs(null); return; }
-      setLiveFaqs(published);
+      setLiveFaqs(published);   // empty array = no published FAQs, still no hardcoded fallback
+      setFaqLoading(false);
       setActiveCat('all');
     }, err => {
       console.error('FAQ Firestore error:', err);
-      setLiveFaqs(null);
+      setFaqLoading(false);
+      setLiveFaqs([]);          // error → show empty, not hardcoded
     });
     return () => unsub();
   }, []);
@@ -518,16 +520,9 @@ export default function FAQPage() {
     navigate('/');
   };
 
-  // Use live Firestore FAQs if available, otherwise fall back to hardcoded translations
-  const usingLive = !!liveFaqs;
-  const srcFaqs = usingLive
-    ? liveFaqs.map((f, i) => ({ q: f.question, a: f.answer, cat: f.category, _idx: i }))
-    : t.faqs;
-
-  const liveCats = usingLive
-    ? ['all', ...Array.from(new Set(liveFaqs.map(f => f.category)))]
-    : ['all', 'complaints', 'tracking', 'account', 'privacy', 'technical'];
-  const cats = liveCats;
+  // Always use Firestore data — no hardcoded fallback
+  const srcFaqs = (liveFaqs || []).map((f, i) => ({ q: f.question, a: f.answer, cat: f.category, _idx: i }));
+  const cats = ['all', ...Array.from(new Set((liveFaqs || []).map(f => f.category)))];
 
   const sq = search.toLowerCase();
   const filtered = srcFaqs.filter(f => {
@@ -678,13 +673,18 @@ export default function FAQPage() {
                   className={`cat-pill${activeCat === c ? ' active' : ''}`}
                   onClick={() => { setActiveCat(c); setOpenIdx(null); }}
                 >
-                  {c === 'all' ? t.all : (usingLive ? c : (t.categories[c] || c))}
+                  {c === 'all' ? t.all : c}
                 </button>
               ))}
             </div>
 
             {/* FAQ List */}
-            {filtered.length === 0 ? (
+            {faqLoading ? (
+              <div className="no-results">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:0.4, animation:'spin 1s linear infinite'}}><circle cx="12" cy="12" r="10" strokeDasharray="31.4" strokeDashoffset="10"/></svg>
+                <p style={{opacity:0.5}}>Loading FAQs…</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="no-results">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <p>{t.noResults}</p>
@@ -693,7 +693,7 @@ export default function FAQPage() {
               Object.entries(grouped).map(([cat, items]) => (
                 <div key={cat}>
                   {activeCat === 'all' && (
-                    <div className="section-label">{usingLive ? cat : (t.categories[cat] || cat)}</div>
+                    <div className="section-label">{cat}</div>
                   )}
                   {items.map((item) => {
                     const key = `${cat}-${item._idx}`;
