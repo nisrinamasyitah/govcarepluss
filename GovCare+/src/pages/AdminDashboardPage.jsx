@@ -3379,7 +3379,7 @@ export default function AdminDashboardPage() {
 
             <div className="sidebar-section-label">Complaint Management</div>
             <ul className="sidebar-nav">
-              <SidebarLink id="all-complaints" label="All Complaints" count={stats.pending} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>} />
+              <SidebarLink id="all-complaints" label="All Complaints" count={stats.total} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>} />
               <SidebarLink id="priority-queue" label="Priority Queue" count={priorityQueue.filter(c => c.priority === 'High').length} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>} />
               <SidebarLink id="manual-review" label="Manual Routing" count={manualReview.length > 0 ? manualReview.length : null} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="3"/><path d="M11 2a9 9 0 1 0 0 18A9 9 0 0 0 11 2z" strokeDasharray="3 2"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>} />
             </ul>
