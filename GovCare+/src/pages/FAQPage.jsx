@@ -505,6 +505,8 @@ export default function FAQPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [liveFaqs, setLiveFaqs]       = useState(null);
   const [faqLoading, setFaqLoading]   = useState(true);
+  const [faqError, setFaqError]       = useState(false);
+  const [faqRetry, setFaqRetry]       = useState(0);
 
   const [notifOpen, setNotifOpen]     = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -523,11 +525,13 @@ export default function FAQPage() {
   }, []);
 
   useEffect(() => {
+    let unsubSnap = null;
     const unsubAuth = onAuthStateChanged(auth, user => {
+      if (unsubSnap) { unsubSnap(); unsubSnap = null; }
       if (!user) return;
       setCurrentUser(user);
       const q = query(collection(db, 'complaints'), where('citizenId', '==', user.uid));
-      const unsubSnap = onSnapshot(q, snap => {
+      unsubSnap = onSnapshot(q, snap => {
         const readIds = JSON.parse(localStorage.getItem('govcare-read-notifs') || '[]');
         const timeAgo = d => {
           if (!d) return '';
@@ -537,22 +541,21 @@ export default function FAQPage() {
         const notifs = snap.docs.map(doc => {
           const c = { docId: doc.id, ...doc.data() };
           let type = 'info', title = '', text = '';
-          if (c.status === 'Resolved')       { type='success'; title='Complaint Resolved';    text=`Your complaint ${c.id} has been resolved successfully.`; }
-          else if (c.status === 'In Progress') { type='info';    title='Complaint In Progress'; text=`${c.ministryLabel||c.ministry} is working on complaint ${c.id}.`; }
-          else if (c.status === 'Pending Review') { type='warning'; title='Under Review';     text=`Complaint ${c.id} is being reviewed by ${c.ministryLabel||c.ministry}.`; }
-          else if (c.status === 'Rejected')  { type='warning';  title='Complaint Rejected';  text=`Your complaint ${c.id} could not be processed.`; }
+          if (c.status === 'Resolved')          { type='success'; title='Complaint Resolved';    text=`Your complaint ${c.id} has been resolved successfully.`; }
+          else if (c.status === 'In Progress')   { type='info';    title='Complaint In Progress'; text=`${c.ministryLabel||c.ministry} is working on complaint ${c.id}.`; }
+          else if (c.status === 'Pending Review'){ type='warning'; title='Under Review';          text=`Complaint ${c.id} is being reviewed by ${c.ministryLabel||c.ministry}.`; }
+          else if (c.status === 'Rejected')      { type='warning'; title='Complaint Rejected';    text=`Your complaint ${c.id} could not be processed.`; }
           else { type='info'; title='Complaint Submitted'; text=`Your complaint ${c.id} has been received and is awaiting review.`; }
           return { id: `${c.docId}-${c.status}`, type, title, text, time: timeAgo(c.date), unread: !readIds.includes(`${c.docId}-${c.status}`) };
         });
         notifs.sort((a, b) => b.unread - a.unread);
         setNotifications(notifs.slice(0, 10));
       });
-      return () => unsubSnap();
     });
-    return () => unsubAuth();
+    return () => { unsubAuth(); if (unsubSnap) unsubSnap(); };
   }, []);
 
-  // Live FAQ listener — reads published FAQs from Firestore (managed by admin in FAQ Management)
+  // Live FAQ listener — reads published FAQs from Firestore. faqRetry bumps to force re-subscribe.
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'faqs')), snap => {
       const published = snap.docs
@@ -563,16 +566,17 @@ export default function FAQPage() {
           if ((a.category || '') > (b.category || '')) return 1;
           return (a.order || 0) - (b.order || 0);
         });
-      setLiveFaqs(published);   // empty array = no published FAQs, still no hardcoded fallback
+      setFaqError(false);
+      setLiveFaqs(published);
       setFaqLoading(false);
       setActiveCat('all');
-    }, err => {
-      console.error('FAQ Firestore error:', err);
+    }, () => {
+      setFaqError(true);
       setFaqLoading(false);
-      setLiveFaqs([]);          // error → show empty, not hardcoded
+      setLiveFaqs([]);
     });
     return () => unsub();
-  }, []);
+  }, [faqRetry]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handler = e => {
@@ -825,6 +829,20 @@ export default function FAQPage() {
               <div className="no-results">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:0.4, animation:'spin 1s linear infinite'}}><circle cx="12" cy="12" r="10" strokeDasharray="31.4" strokeDashoffset="10"/></svg>
                 <p style={{opacity:0.5}}>Loading FAQs…</p>
+              </div>
+            ) : faqError ? (
+              <div className="no-results">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <p style={{marginBottom:12}}>Could not load FAQs. Please check your connection.</p>
+                <button onClick={() => { setFaqLoading(true); setFaqError(false); setLiveFaqs(null); setFaqRetry(r => r + 1); }}
+                  style={{padding:'8px 20px',background:'#090088',color:'white',border:'none',borderRadius:8,cursor:'pointer',fontSize:13,fontWeight:600}}>
+                  Try Again
+                </button>
+              </div>
+            ) : (liveFaqs || []).length === 0 ? (
+              <div className="no-results">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <p>No FAQs available yet.</p>
               </div>
             ) : filtered.length === 0 ? (
               <div className="no-results">
