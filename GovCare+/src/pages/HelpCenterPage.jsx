@@ -255,11 +255,15 @@ const css = `
   .help-page.dark .sidebar-title { color: #94a3b8; }
   .sidebar-menu { list-style: none; }
   .sidebar-menu li { margin-bottom: 4px; }
-  .sidebar-menu a, .sidebar-logout { display: flex; align-items: center; gap: 12px; padding: 12px; color: #4b5563; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; cursor: pointer; background: none; border: none; width: 100%; font-family: inherit; }
-  .sidebar-menu a:hover, .sidebar-logout:hover { background: #f3f4f6; color: #1a1a1a; }
+  .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px; color: #4b5563; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+  .sidebar-menu a:hover { background: #f3f4f6; color: #1a1a1a; }
+  .sidebar-logout { display: flex; align-items: center; gap: 12px; padding: 12px; width: 100%; border: none; font-family: inherit; cursor: pointer; font-size: 14px; font-weight: 500; border-radius: 8px; text-align: left; transition: all 0.2s; color: #ef4444; background: rgba(239,68,68,0.08); }
+  .sidebar-logout:hover { background: rgba(239,68,68,0.15); color: #dc2626; }
   .sidebar-menu a.active { background: #ede9fe; color: #090088; font-weight: 600; }
-  .help-page.dark .sidebar-menu a, .help-page.dark .sidebar-logout { color: #cbd5e1; }
-  .help-page.dark .sidebar-menu a:hover, .help-page.dark .sidebar-logout:hover { background: #334155; color: #f1f5f9; }
+  .help-page.dark .sidebar-menu a { color: #cbd5e1; }
+  .help-page.dark .sidebar-menu a:hover { background: #334155; color: #f1f5f9; }
+  .help-page.dark .sidebar-logout { color: #f87171; background: rgba(239,68,68,0.1); }
+  .help-page.dark .sidebar-logout:hover { background: rgba(239,68,68,0.2); color: #f87171; }
   .help-page.dark .sidebar-menu a.active { background: #312e81; color: #a5b4fc; }
   .menu-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
