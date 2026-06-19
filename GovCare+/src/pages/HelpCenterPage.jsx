@@ -115,13 +115,6 @@ const ministries = [
   { name: 'Ministry of Environment', phone: '+60388861111', display: '+603-8886 1111', bg: '#ccfbf1', iconColor: '#0d9488', iconType: 'globe' },
 ];
 
-const faqs = [
-  { q: 'How do I submit a new complaint?', a: 'Click on "Submit Complaint" in the sidebar menu. Fill in your complaint details, select the appropriate category, and upload any supporting documents. Our AI system will automatically route your complaint to the right ministry.' },
-  { q: 'How can I track my complaint status?', a: 'Go to "Track Status" in the sidebar. You can view all your submitted complaints and their current status. Use the reference number (e.g., C-2026-0234) to search for specific complaints.' },
-  { q: 'What is the expected response time?', a: 'Initial acknowledgment is provided within 24 hours. Resolution time varies based on complaint complexity — simple issues may be resolved within 3-5 working days, while complex cases may take up to 14 working days.' },
-  { q: 'How does the AI classification work?', a: 'Our BERT-based NLP model analyzes your complaint text and automatically categorizes it into one of six ministry categories: Health, Transport, Education, Infrastructure, Public Safety, or Environment. The system achieves 87.5% accuracy in classification.' },
-  { q: 'Is my personal information secure?', a: "Yes, GovCare+ uses TLS 1.3 encryption for data transmission and AES-256 encryption for data storage. We comply with Malaysia's Personal Data Protection Act (PDPA) 2010. Your IC number is partially masked in the system." },
-];
 
 function getBotResponse(message) {
   const m = message.toLowerCase();
@@ -425,7 +418,9 @@ export default function HelpCenterPage() {
   const [langOpen, setLangOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaq, setOpenFaq]     = useState(null);
+  const [liveFaqs, setLiveFaqs]   = useState([]);
+  const [faqLoading, setFaqLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { id: 1, sender: 'bot', text: "Hello! 👋 Welcome to GovCare+ support. I'm here to help you with your complaints and inquiries. How can I assist you today?", time: 'Just now' },
@@ -450,6 +445,22 @@ export default function HelpCenterPage() {
     if (localStorage.getItem('govcare-theme') === 'dark') setDarkMode(true);
     const savedLang = localStorage.getItem('govcare-language') || 'en';
     setLanguage(savedLang);
+  }, []);
+
+  useEffect(() => {
+    const unsub = onSnapshot(query(collection(db, 'faqs')), snap => {
+      const published = snap.docs
+        .map(d => ({ ...d.data(), id: d.id }))
+        .filter(f => f.published === true)
+        .sort((a, b) => {
+          if ((a.category || '') < (b.category || '')) return -1;
+          if ((a.category || '') > (b.category || '')) return 1;
+          return (a.order || 0) - (b.order || 0);
+        });
+      setLiveFaqs(published);
+      setFaqLoading(false);
+    }, () => { setFaqLoading(false); });
+    return () => unsub();
   }, []);
 
   // Auth + real-time notifications from Firebase complaints
@@ -848,17 +859,23 @@ export default function HelpCenterPage() {
             {/* FAQ */}
             <div className="faq-section">
               <div className="section-title" style={{ marginBottom: 20 }}>{t.faqTitle}</div>
-              {faqs.map((faq, i) => (
-                <div key={i} className="faq-item">
-                  <div className="faq-question" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                    <span>{faq.q}</span>
-                    <div className={`faq-toggle${openFaq === i ? ' open' : ''}`}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+              {faqLoading ? (
+                <p style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', padding: '20px 0' }}>Loading…</p>
+              ) : liveFaqs.length === 0 ? (
+                <p style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', padding: '20px 0' }}>No FAQs available.</p>
+              ) : (
+                liveFaqs.map((faq, i) => (
+                  <div key={faq.id || i} className="faq-item">
+                    <div className="faq-question" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                      <span>{faq.question}</span>
+                      <div className={`faq-toggle${openFaq === i ? ' open' : ''}`}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
                     </div>
+                    {openFaq === i && <div className="faq-answer">{faq.answer}</div>}
                   </div>
-                  {openFaq === i && <div className="faq-answer">{faq.a}</div>}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
