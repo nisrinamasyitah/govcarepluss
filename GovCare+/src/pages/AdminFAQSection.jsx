@@ -329,12 +329,20 @@ export default function AdminFAQSection({ darkMode, showToast }) {
   }
 
   async function handleTogglePublish(faq) {
+    const newPublished = !faq.published;
     try {
-      if (!faq.id.startsWith('default-')) {
-        await updateDoc(doc(db, 'faqs', faq.id), { published: !faq.published, updatedAt: serverTimestamp() });
+      if (faq.id.startsWith('default-')) {
+        // Firestore not available — update local state so the UI responds
+        setFaqs(prev => prev.map(f => f.id === faq.id ? { ...f, published: newPublished } : f));
+      } else {
+        await updateDoc(doc(db, 'faqs', faq.id), { published: newPublished, updatedAt: serverTimestamp() });
+        // onSnapshot will auto-refresh the list
       }
-      showToast?.(faq.published ? 'FAQ set to draft.' : 'FAQ published!');
-    } catch { showToast?.('Update failed.', true); }
+      showToast?.(newPublished ? 'FAQ published!' : 'FAQ set to draft.');
+    } catch (e) {
+      console.error('Toggle publish failed:', e);
+      showToast?.('Update failed — check Firestore permissions.', true);
+    }
   }
 
   async function handleDelete(faq) {
