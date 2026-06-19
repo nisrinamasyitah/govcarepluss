@@ -27,7 +27,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc,
-  onSnapshot, query, orderBy, serverTimestamp,
+  onSnapshot, query, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -261,7 +261,7 @@ export default function AdminFAQSection({ darkMode, showToast }) {
 
   // Real-time listener from Firestore
   useEffect(() => {
-    const q = query(collection(db, 'faqs'), orderBy('category'), orderBy('order'));
+    const q = query(collection(db, 'faqs'));   // no orderBy — avoids composite index requirement; sort client-side
     const unsub = onSnapshot(q, async snap => {
       if (snap.empty && !seeded) {
         // Seed default FAQs on first load
@@ -271,16 +271,21 @@ export default function AdminFAQSection({ darkMode, showToast }) {
             addDoc(collection(db, 'faqs'), { ...faq, createdAt: serverTimestamp(), updatedAt: serverTimestamp() })
           ));
         } catch (_) {
-          // Firestore may not be set up — use local state
           setFaqs(DEFAULT_FAQS.map((f, i) => ({ ...f, id: `default-${i}` })));
           setLoading(false);
         }
         return;
       }
-      setFaqs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const sorted = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => {
+          if ((a.category || '') < (b.category || '')) return -1;
+          if ((a.category || '') > (b.category || '')) return 1;
+          return (a.order || 0) - (b.order || 0);
+        });
+      setFaqs(sorted);
       setLoading(false);
     }, () => {
-      // Fallback to defaults if no Firestore access
       setFaqs(DEFAULT_FAQS.map((f, i) => ({ ...f, id: `default-${i}` })));
       setLoading(false);
     });

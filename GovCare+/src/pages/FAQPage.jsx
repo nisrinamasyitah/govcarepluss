@@ -187,6 +187,8 @@ const css = `
   .faq-page.dark .top-nav { background: #1e293b; border-color: #334155; }
   .nav-left { display: flex; align-items: center; gap: 16px; }
   .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .jata-negara { width: 36px; height: 36px; }
+  .jata-negara img { width: 100%; height: 100%; object-fit: contain; }
   .brand-name { color: #090088; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
   .faq-page.dark .brand-name { color: #ffffff; }
   .nav-right { display: flex; align-items: center; gap: 16px; }
@@ -548,7 +550,8 @@ export default function FAQPage() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <Link to="/dashboard" className="logo-container">
-              <span className="brand-name">GovCare+</span>
+              <div className="jata-negara"><img src="/pictures/Malaysia.svg" alt="Jata Negara Malaysia" /></div>
+              <div className="brand-name">GovCare+</div>
             </Link>
           </div>
           <div className="nav-right">
@@ -636,13 +639,14 @@ export default function FAQPage() {
                     {t.faq}
                   </Link>
                 </li>
+                <li>
+                  <button className="sidebar-logout" onClick={handleLogout}>
+                    <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+                    {t.logout}
+                  </button>
+                </li>
               </ul>
             </div>
-
-            <button className="sidebar-logout" onClick={handleLogout}>
-              <span className="menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
-              {t.logout}
-            </button>
           </aside>
 
           {/* Main */}
