@@ -1,11 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import ReCAPTCHA from 'react-google-recaptcha';
-
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -231,7 +228,6 @@ const css = `
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
-  const recaptchaRef = useRef(null);
   const [darkMode, setDarkMode] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -240,7 +236,8 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState(null);
+  const [honeypot, setHoneypot] = useState('');
+  const [loadTime] = useState(Date.now());
 
   useEffect(() => {
     const saved = localStorage.getItem('govcare-theme');
@@ -261,10 +258,8 @@ export default function AdminLoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!captchaToken) {
-      setError('Please complete the CAPTCHA verification.');
-      return;
-    }
+    if (honeypot) return; // bot detected
+    if (Date.now() - loadTime < 2000) return; // submitted too fast
     setLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
@@ -272,8 +267,6 @@ export default function AdminLoginPage() {
       const adminDoc = await getDoc(doc(db, 'admins', credential.user.uid));
       if (!adminDoc.exists()) {
         await auth.signOut();
-        recaptchaRef.current?.reset();
-        setCaptchaToken(null);
         setError('Access denied. This account does not have admin privileges.');
         setLoading(false);
         return;
@@ -288,8 +281,6 @@ export default function AdminLoginPage() {
       setSuccess(true);
       setTimeout(() => navigate('/admin/dashboard'), 1000);
     } catch (err) {
-      recaptchaRef.current?.reset();
-      setCaptchaToken(null);
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError('Invalid email or password. Please try again.');
       } else if (err.code === 'auth/too-many-requests') {
@@ -424,16 +415,11 @@ export default function AdminLoginPage() {
                   <span>Remember Me</span>
                 </label>
               </div>
-              <div className="captcha-wrapper">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  onChange={token => setCaptchaToken(token)}
-                  onExpired={() => setCaptchaToken(null)}
-                  theme={darkMode ? 'dark' : 'light'}
-                />
-              </div>
-              <button type="submit" className={`btn-admin-login${loading ? ' loading' : ''}`} disabled={loading || !captchaToken}>
+              <input
+                type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
+                style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true"
+              />
+              <button type="submit" className={`btn-admin-login${loading ? ' loading' : ''}`} disabled={loading}>
                 <span className="spinner"></span>
                 <span className="btn-text" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>

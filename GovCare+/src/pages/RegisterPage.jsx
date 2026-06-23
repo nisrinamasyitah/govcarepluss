@@ -4,9 +4,6 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { encryptFields } from '../crypto';
-import ReCAPTCHA from 'react-google-recaptcha';
-
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const translations = {
   en: {
@@ -368,8 +365,8 @@ export default function RegisterPage() {
   const [language, setLanguage] = useState('en');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const recaptchaRef = useRef(null);
-  const [captchaToken, setCaptchaToken] = useState(null);
+  const [honeypot, setHoneypot] = useState('');
+  const [loadTime] = useState(Date.now());
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', icNumber: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState({});
@@ -442,7 +439,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setSubmitError('');
     if (!termsChecked) { setSubmitError(t.acceptError); return; }
-    if (!captchaToken) { setSubmitError('Please complete the CAPTCHA verification before registering.'); return; }
+    if (honeypot) return; // bot detected
+    if (Date.now() - loadTime < 2000) return; // submitted too fast
     const { fullName, email, phone, icNumber, password, confirmPassword } = form;
     if (fullName.length < 3 || !email || !phone || icNumber.length !== 14 || password !== confirmPassword) {
       setSubmitError(t.fillError); return;
@@ -456,8 +454,6 @@ export default function RegisterPage() {
       user = userCredential.user;
       await updateProfile(user, { displayName: fullName });
     } catch (err) {
-      recaptchaRef.current?.reset();
-      setCaptchaToken(null);
       switch (err.code) {
         case 'auth/email-already-in-use':
           setSubmitError('This email is already registered. Please login instead.'); break;
@@ -663,16 +659,12 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <div className="captcha-wrapper">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={RECAPTCHA_SITE_KEY}
-                onChange={token => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-              />
-            </div>
+            <input
+              type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
+              style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true"
+            />
 
-            <button type="submit" className="btn-register" disabled={loading || !captchaToken}>
+            <button type="submit" className="btn-register" disabled={loading}>
               {loading ? t.creating : t.createBtn}
             </button>
 

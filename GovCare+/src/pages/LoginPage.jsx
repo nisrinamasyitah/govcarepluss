@@ -2,10 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
-import ReCAPTCHA from 'react-google-recaptcha';
-
-
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const translations = {
   en: {
@@ -316,8 +312,8 @@ export default function LoginPage() {
   const [resetError, setResetError] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const dropdownRef = useRef(null);
-  const recaptchaRef = useRef(null);
-  const [captchaToken, setCaptchaToken] = useState(null);
+  const [honeypot, setHoneypot] = useState('');
+  const [loadTime] = useState(Date.now());
   const t = translations[language];
 
   function showModal(icon, title, message) {
@@ -386,10 +382,8 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(''); setSuccess(false);
-    if (!captchaToken) {
-      setError('Please complete the CAPTCHA verification before logging in.');
-      return;
-    }
+    if (honeypot) return; // bot detected
+    if (Date.now() - loadTime < 2000) return; // submitted too fast
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -410,8 +404,6 @@ export default function LoginPage() {
       await new Promise(r => setTimeout(r, 1000));
       navigate('/dashboard');
     } catch (err) {
-      recaptchaRef.current?.reset();
-      setCaptchaToken(null);
       switch (err.code) {
         case 'auth/user-not-found':
         case 'auth/wrong-password':
@@ -510,15 +502,11 @@ export default function LoginPage() {
               </div>
               <a href="#" className="forgot-password" onClick={e => { e.preventDefault(); openForgotPassword(); }}>{t.forgotPassword}</a>
             </div>
-            <div className="captcha-wrapper">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={RECAPTCHA_SITE_KEY}
-                onChange={token => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-              />
-            </div>
-            <button type="submit" className={`btn-login-submit${loading ? ' loading' : ''}`} disabled={loading || !captchaToken}>
+            <input
+              type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
+              style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true"
+            />
+            <button type="submit" className={`btn-login-submit${loading ? ' loading' : ''}`} disabled={loading}>
               <span className="spinner"></span>
               <span className="btn-text">{t.loginBtn}</span>
             </button>
