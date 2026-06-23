@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import SlidePuzzle from '../components/SlidePuzzle';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -264,15 +265,6 @@ const css = `
   .robot-check-badge { display:flex; flex-direction:column; align-items:center; gap:2px; }
   .robot-check-badge svg { opacity:0.5; }
   .robot-check-badge span { font-size:8px; color:#999; }
-  .robot-challenge { width:300px; background:#fff; border:1px solid #d3d3d3; border-radius:4px; padding:12px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-  .robot-challenge p { font-size:13px; color:#555; margin:0 0 10px; }
-  .robot-challenge strong { color:#1a1a1a; font-size:15px; letter-spacing:0.5px; }
-  .robot-challenge-row { display:flex; gap:8px; align-items:center; }
-  .robot-challenge-row input { flex:1; padding:7px 10px; border:1px solid #ccc; border-radius:4px; font-size:14px; outline:none; }
-  .robot-challenge-row input:focus { border-color:#1a73e8; }
-  .robot-challenge-row button { padding:7px 14px; background:#1a73e8; color:#fff; border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:500; }
-  .robot-challenge-row button:hover { background:#1558b0; }
-  .robot-challenge-err { font-size:12px; color:#d32f2f; margin:6px 0 0; }
 
   @media (max-width: 767px) {
     .login-page { padding: 24px 12px; align-items: flex-start; padding-top: 32px; }
@@ -332,35 +324,10 @@ export default function LoginPage() {
   const [loadTime] = useState(Date.now());
   const [notRobot, setNotRobot] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
-  const [challenge, setChallenge] = useState(null);
-  const [challengeInput, setChallengeInput] = useState('');
-  const [challengeError, setChallengeError] = useState('');
-
-  function generateChallenge() {
-    const pairs = [[2,9],[3,8],[4,7],[5,6],[6,9],[7,8],[3,5],[4,6],[8,9],[5,7]];
-    const [a, b] = pairs[Math.floor(Math.random() * pairs.length)];
-    const useAdd = Math.random() > 0.4;
-    return useAdd ? { q: `${a} + ${b}`, ans: a + b } : { q: `${a + b} − ${a}`, ans: b };
-  }
 
   function handleRobotClick() {
     if (notRobot) { setNotRobot(false); setShowChallenge(false); return; }
-    setChallenge(generateChallenge());
-    setChallengeInput('');
-    setChallengeError('');
     setShowChallenge(true);
-  }
-
-  function verifyChallenge() {
-    if (parseInt(challengeInput, 10) === challenge.ans) {
-      setNotRobot(true);
-      setShowChallenge(false);
-      setChallengeError('');
-    } else {
-      setChallenge(generateChallenge());
-      setChallengeInput('');
-      setChallengeError('Wrong answer, try again.');
-    }
   }
   const t = translations[language];
 
@@ -563,19 +530,7 @@ export default function LoginPage() {
                 </div>
               </div>
               {showChallenge && (
-                <div className="robot-challenge">
-                  <p>Solve to verify: <strong>{challenge.q} = ?</strong></p>
-                  <div className="robot-challenge-row">
-                    <input
-                      type="number" value={challengeInput} placeholder="Your answer"
-                      onChange={e => setChallengeInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && verifyChallenge()}
-                      autoFocus
-                    />
-                    <button type="button" onClick={verifyChallenge}>Verify</button>
-                  </div>
-                  {challengeError && <p className="robot-challenge-err">{challengeError}</p>}
-                </div>
+                <SlidePuzzle onVerified={() => { setNotRobot(true); setShowChallenge(false); }} />
               )}
             </div>
             <button type="submit" className={`btn-login-submit${loading ? ' loading' : ''}`} disabled={loading || !notRobot}>
