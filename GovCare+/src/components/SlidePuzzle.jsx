@@ -1,34 +1,37 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import puzzleBg from '../assets/puzzle-bg.jpg';
 
-const W = 300;       // total width
-const BGH = 148;     // background image height
-const PBW = 46;      // piece body width
-const PTW = 13;      // tab protrusion width
-const PH = 46;       // piece height
-const PY = Math.round((BGH - PH) / 2);
-const MAX_X = W - PBW - PTW - 2;
+const W = 300;      // container width
+const BGH = 150;    // background height (matches 600x300 image at 300x150)
+const PBW = 46;     // piece body width
+const PTW = 13;     // tab protrusion on right side
+const PH = 46;      // piece height
+const PY = Math.round((BGH - PH) / 2);  // 52 — vertically centred
+const MAX_X = W - PBW - PTW - 2;        // 239 — max drag distance
 
-function makePiecePath(bw, tw, h) {
-  const t1 = Math.round(h * 0.3), t2 = Math.round(h * 0.7);
+// Jigsaw path: rectangle body + curved tab on right side
+function piecePath(bw, tw, h) {
+  const t1 = Math.round(h * 0.3);
+  const t2 = Math.round(h * 0.7);
   return `M0,0 L${bw},0 L${bw},${t1} Q${bw + tw},${h / 2} ${bw},${t2} L${bw},${h} L0,${h} Z`;
 }
 
-function makeHolePath(tx, ty, bw, tw, h) {
-  const t1 = Math.round(h * 0.3), t2 = Math.round(h * 0.7);
+function holePath(tx, ty, bw, tw, h) {
+  const t1 = Math.round(h * 0.3);
+  const t2 = Math.round(h * 0.7);
   return `M${tx},${ty} L${tx + bw},${ty} L${tx + bw},${ty + t1} Q${tx + bw + tw},${ty + h / 2} ${tx + bw},${ty + t2} L${tx + bw},${ty + h} L${tx},${ty + h} Z`;
 }
 
-const BLOBS = [[30,18,70],[130,65,55],[240,25,65],[20,88,44],[205,88,38],[160,10,30]];
-
 export default function SlidePuzzle({ onVerified }) {
-  const [target] = useState(() =>
-    Math.round(Math.random() * (MAX_X - PBW - 40)) + PBW + 40
-  );
+  // Hole is always somewhere clearly to the right of centre
+  const [target] = useState(() => Math.round(Math.random() * 120) + 100);
   const [x, setX] = useState(0);
   const [drag, setDrag] = useState(false);
   const [origin, setOrigin] = useState(0);
   const [status, setStatus] = useState('idle'); // idle | success | fail
   const xRef = useRef(0);
+  // Unique IDs per instance so multiple puzzles don't conflict in the DOM
+  const uid = useRef(`sp${Math.random().toString(36).slice(2, 7)}`).current;
 
   const doMove = useCallback(cx => {
     if (!drag) return;
@@ -45,12 +48,12 @@ export default function SlidePuzzle({ onVerified }) {
       xRef.current = target;
       setX(target);
       setStatus('success');
-      setTimeout(onVerified, 650);
+      setTimeout(onVerified, 700);
     } else {
       setStatus('fail');
       xRef.current = 0;
       setX(0);
-      setTimeout(() => setStatus('idle'), 750);
+      setTimeout(() => setStatus('idle'), 800);
     }
   }, [drag, target, onVerified]);
 
@@ -80,55 +83,92 @@ export default function SlidePuzzle({ onVerified }) {
   const handleLeft = pct * (W - 44);
   const isOk = status === 'success';
   const isBad = status === 'fail';
-
-  const pieceColor = isOk ? '#4caf50' : isBad ? '#ef5350' : 'rgba(255,255,255,0.94)';
-  const handleBg = isOk ? '#4caf50' : isBad ? '#ef5350' : '#1a73e8';
-  const piecePath = makePiecePath(PBW, PTW, PH);
-  const holePath = makeHolePath(target, PY, PBW, PTW, PH);
   const noTrans = drag;
 
+  const piece = piecePath(PBW, PTW, PH);
+  const hole = holePath(target, PY, PBW, PTW, PH);
+  const clipId = `clip-${uid}`;
+  const shadowId = `shadow-${uid}`;
+
   return (
-    <div style={{ width: W, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 14px rgba(0,0,0,0.18)', border: '1px solid #ccc', userSelect: 'none' }}>
+    <div style={{ width: W, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 14px rgba(0,0,0,0.2)', border: '1px solid #ccc', userSelect: 'none' }}>
 
-      {/* Puzzle image area */}
-      <div style={{ position: 'relative', width: W, height: BGH, background: 'linear-gradient(135deg,#1a2a6c 0%,#1e5fa8 50%,#1a73e8 100%)', overflow: 'hidden' }}>
-        {BLOBS.map(([lx, ly, sz], i) => (
-          <div key={i} style={{ position: 'absolute', left: lx, top: ly, width: sz, height: sz, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-        ))}
+      {/* ── Puzzle image area ── */}
+      <div style={{ position: 'relative', width: W, height: BGH, overflow: 'hidden' }}>
 
-        {/* Hole SVG overlay */}
-        <svg style={{ position: 'absolute', inset: 0, width: W, height: BGH, overflow: 'visible', pointerEvents: 'none' }}>
-          <defs>
-            <filter id="hole-inner">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#000" floodOpacity="0.6" />
-            </filter>
-          </defs>
-          <path d={holePath} fill="rgba(0,0,0,0.42)" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeDasharray="5 3" />
+        {/* Background photo */}
+        <img
+          src={puzzleBg}
+          draggable={false}
+          style={{ position: 'absolute', inset: 0, width: W, height: BGH, objectFit: 'fill', display: 'block' }}
+        />
+
+        {/* Hole overlay — dark cutout with dashed border */}
+        <svg
+          style={{ position: 'absolute', inset: 0, width: W, height: BGH, overflow: 'visible', pointerEvents: 'none' }}
+        >
+          <path
+            d={hole}
+            fill="rgba(0,0,0,0.5)"
+            stroke="rgba(255,255,255,0.75)"
+            strokeWidth="2"
+            strokeDasharray="5 3"
+          />
         </svg>
 
-        {/* Sliding puzzle piece */}
+        {/* Sliding puzzle piece — shows matching image fragment clipped to jigsaw shape */}
         <svg
           onMouseDown={e => startDrag(e.clientX, e)}
           onTouchStart={e => startDrag(e.touches[0].clientX, e)}
           style={{
-            position: 'absolute', left: x, top: PY,
+            position: 'absolute',
+            left: x,
+            top: PY,
             overflow: 'visible',
             cursor: drag ? 'grabbing' : 'grab',
             transition: noTrans ? 'none' : 'left 0.45s ease',
             touchAction: 'none',
           }}
-          width={PBW} height={PH}
+          width={PBW + PTW}
+          height={PH}
         >
           <defs>
-            <filter id="piece-shadow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.45" />
+            {/* Clip to jigsaw shape */}
+            <clipPath id={clipId}>
+              <path d={piece} />
+            </clipPath>
+            {/* Drop shadow following the jigsaw boundary */}
+            <filter id={shadowId} x="-25%" y="-25%" width="150%" height="175%">
+              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#000" floodOpacity="0.55" />
             </filter>
           </defs>
-          <path d={piecePath} fill={pieceColor} filter="url(#piece-shadow)" stroke={isOk ? '#4caf50' : isBad ? '#ef5350' : 'rgba(255,255,255,0.85)'} strokeWidth="1" />
+
+          {/* Image cut from the TARGET position, clipped to jigsaw shape */}
+          <g filter={`url(#${shadowId})`}>
+            <image
+              href={puzzleBg}
+              x={-target}
+              y={-PY}
+              width={W}
+              height={BGH}
+              preserveAspectRatio="none"
+              clipPath={`url(#${clipId})`}
+            />
+          </g>
+
+          {/* Success / fail colour overlay */}
+          {isOk && <path d={piece} fill="rgba(76,175,80,0.5)" clipPath={`url(#${clipId})`} />}
+          {isBad && <path d={piece} fill="rgba(239,83,80,0.5)" clipPath={`url(#${clipId})`} />}
+
+          {/* Jigsaw border */}
+          <path d={piece} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2" />
+
+          {/* Status icons */}
           {isOk && (
             <polyline
-              points={`${PBW*0.28},${PH*0.52} ${PBW*0.45},${PH*0.68} ${PBW*0.72},${PH*0.34}`}
-              fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+              points={`${PBW*0.25},${PH*0.52} ${PBW*0.43},${PH*0.68} ${PBW*0.72},${PH*0.33}`}
+              fill="none" stroke="white" strokeWidth="2.5"
+              strokeLinecap="round" strokeLinejoin="round"
             />
           )}
           {isBad && (
@@ -137,46 +177,43 @@ export default function SlidePuzzle({ onVerified }) {
               <line x1={PBW*0.7} y1={PH*0.3} x2={PBW*0.3} y2={PH*0.7} stroke="white" strokeWidth="2.5" strokeLinecap="round" />
             </>
           )}
-          {!isOk && !isBad && (
-            <image href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a73e8' stroke-width='1.5'%3E%3Cpath d='M4 8h2V4h12v4h2v12h-2v4H6v-4H4V8z' stroke-linejoin='round'/%3E%3Cpath d='M10 4v3a2 2 0 000 4v3M14 20v-3a2 2 0 000-4v-3' stroke-linejoin='round'/%3E%3C/svg%3E"
-              x={PBW*0.16} y={PH*0.16} width={PBW*0.68} height={PH*0.68}
-            />
-          )}
         </svg>
 
-        {/* Status text */}
+        {/* Status text at bottom of image area */}
         {(isOk || isBad) && (
           <div style={{
-            position: 'absolute', bottom: 8, left: 0, right: 0,
+            position: 'absolute', bottom: 6, left: 0, right: 0,
             textAlign: 'center', fontSize: 12, fontWeight: 600,
-            color: isOk ? '#a5d6a7' : '#ef9a9a',
-            letterSpacing: '0.5px',
+            color: isOk ? '#c8f0c8' : '#f9c0c0',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
           }}>
-            {isOk ? 'Verified — you may proceed' : 'Incorrect position, try again'}
+            {isOk ? 'Verified — you may proceed' : 'Try again'}
           </div>
         )}
       </div>
 
-      {/* Slider bar */}
+      {/* ── Slider bar ── */}
       <div style={{ position: 'relative', height: 44, background: '#f2f2f2', borderTop: '1px solid #ddd', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+
         {/* Progress fill */}
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0,
           width: `${pct * 100}%`,
-          background: isOk ? 'rgba(76,175,80,0.22)' : 'rgba(26,115,232,0.14)',
+          background: isOk ? 'rgba(76,175,80,0.25)' : 'rgba(26,115,232,0.15)',
           transition: noTrans ? 'none' : 'width 0.45s ease',
         }} />
 
         {/* Label */}
         <span style={{
-          position: 'absolute', left: 52, right: 0, textAlign: 'center',
-          fontSize: 13, color: '#bbb', pointerEvents: 'none',
+          position: 'absolute', left: 52, right: 0,
+          textAlign: 'center', fontSize: 13, color: '#bbb',
+          pointerEvents: 'none',
           opacity: pct > 0.1 ? 0 : 1, transition: 'opacity 0.2s',
         }}>
-          Slide the piece to the gap →
+          Slide to fit the piece →
         </span>
 
-        {/* Handle */}
+        {/* Drag handle */}
         <div
           onMouseDown={e => startDrag(e.clientX, e)}
           onTouchStart={e => startDrag(e.touches[0].clientX, e)}
@@ -184,7 +221,7 @@ export default function SlidePuzzle({ onVerified }) {
             position: 'absolute',
             left: handleLeft,
             width: 44, height: 44,
-            background: handleBg,
+            background: isOk ? '#4caf50' : isBad ? '#ef5350' : '#1a73e8',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: drag ? 'grabbing' : 'grab',
             transition: noTrans ? 'none' : 'left 0.45s ease, background 0.25s',
