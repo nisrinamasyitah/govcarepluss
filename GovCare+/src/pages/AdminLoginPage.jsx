@@ -437,7 +437,16 @@ export default function AdminLoginPage() {
                   </div>
                   <span className="robot-check-label">I'm not a robot</span>
                   <div className="robot-check-badge">
-                    <svg width="32" height="32" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="4" fill="#4A90D9"/><text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontSize="28" fill="white">🛡️</text></svg>
+                    <div style={{background:'linear-gradient(180deg,#4285f4 0%,#1a56c4 100%)',borderRadius:4,padding:'5px 7px',display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+                      <svg width="32" height="26" viewBox="0 0 36 30" fill="none">
+                        <path d="M3,15 A15,15 0 0,1 33,15" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+                        <polyline points="33,8 33,15 26,15" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M33,15 A15,15 0 0,1 3,15" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+                        <polyline points="3,22 3,15 10,15" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span style={{color:'white',fontSize:6.5,fontWeight:700,letterSpacing:0.4,lineHeight:1,fontFamily:'Arial,sans-serif'}}>reCAPTCHA</span>
+                      <span style={{color:'rgba(255,255,255,0.65)',fontSize:5.5,lineHeight:1,fontFamily:'Arial,sans-serif'}}>Privacy · Terms</span>
+                    </div>
                     <span>Protected</span>
                   </div>
                 </div>
