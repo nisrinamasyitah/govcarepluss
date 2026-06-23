@@ -301,6 +301,12 @@ const css = `
   .security-badge { background: #dcfce7; color: #16a34a; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
   .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 8px; overflow-x: auto; }
+  .robot-check { display:flex; align-items:center; gap:14px; background:#f9f9f9; border:1px solid #d3d3d3; border-radius:4px; padding:14px 16px; width:300px; box-shadow:0 1px 3px rgba(0,0,0,0.1); cursor:pointer; user-select:none; }
+  .robot-check-box { width:24px; height:24px; border:2px solid #c1c1c1; border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:white; transition:border-color 0.15s; }
+  .robot-check-box.checked { border-color:#1a73e8; background:#1a73e8; }
+  .robot-check-label { font-size:14px; color:#333; flex:1; }
+  .robot-check-badge { display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .robot-check-badge span { font-size:8px; color:#999; }
 
   @media (max-width: 767px) {
     .register-page { padding: 24px 12px; align-items: flex-start; padding-top: 32px; }
@@ -367,6 +373,7 @@ export default function RegisterPage() {
   const dropdownRef = useRef(null);
   const [honeypot, setHoneypot] = useState('');
   const [loadTime] = useState(Date.now());
+  const [notRobot, setNotRobot] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', icNumber: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState({});
@@ -659,12 +666,21 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <input
-              type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
-              style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true"
-            />
+            <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+            <div className="captcha-wrapper">
+              <div className="robot-check" onClick={() => setNotRobot(v => !v)}>
+                <div className={`robot-check-box${notRobot ? ' checked' : ''}`}>
+                  {notRobot && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                </div>
+                <span className="robot-check-label">I'm not a robot</span>
+                <div className="robot-check-badge">
+                  <svg width="32" height="32" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="4" fill="#4A90D9"/><text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontSize="28" fill="white">🛡️</text></svg>
+                  <span>Protected</span>
+                </div>
+              </div>
+            </div>
 
-            <button type="submit" className="btn-register" disabled={loading}>
+            <button type="submit" className="btn-register" disabled={loading || !notRobot}>
               {loading ? t.creating : t.createBtn}
             </button>
 

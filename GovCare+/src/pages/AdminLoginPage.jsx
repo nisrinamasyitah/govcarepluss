@@ -191,6 +191,12 @@ const css = `
   .right-footer p { font-size: 12px; color: #334155; }
 
   .captcha-wrapper { display: flex; justify-content: center; margin: 0 0 20px; overflow-x: auto; }
+  .robot-check { display:flex; align-items:center; gap:14px; background:#f9f9f9; border:1px solid #d3d3d3; border-radius:4px; padding:14px 16px; width:300px; box-shadow:0 1px 3px rgba(0,0,0,0.1); cursor:pointer; user-select:none; }
+  .robot-check-box { width:24px; height:24px; border:2px solid #c1c1c1; border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:white; transition:border-color 0.15s; }
+  .robot-check-box.checked { border-color:#1a73e8; background:#1a73e8; }
+  .robot-check-label { font-size:14px; color:#333; flex:1; }
+  .robot-check-badge { display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .robot-check-badge span { font-size:8px; color:#999; }
 
   /* ── iPad (768–1024px) ── */
   @media (max-width: 1024px) {
@@ -238,6 +244,7 @@ export default function AdminLoginPage() {
   const [success, setSuccess] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [loadTime] = useState(Date.now());
+  const [notRobot, setNotRobot] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('govcare-theme');
@@ -415,11 +422,20 @@ export default function AdminLoginPage() {
                   <span>Remember Me</span>
                 </label>
               </div>
-              <input
-                type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
-                style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true"
-              />
-              <button type="submit" className={`btn-admin-login${loading ? ' loading' : ''}`} disabled={loading}>
+              <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+              <div className="captcha-wrapper">
+                <div className="robot-check" onClick={() => setNotRobot(v => !v)}>
+                  <div className={`robot-check-box${notRobot ? ' checked' : ''}`}>
+                    {notRobot && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                  </div>
+                  <span className="robot-check-label">I'm not a robot</span>
+                  <div className="robot-check-badge">
+                    <svg width="32" height="32" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="4" fill="#4A90D9"/><text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontSize="28" fill="white">🛡️</text></svg>
+                    <span>Protected</span>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" className={`btn-admin-login${loading ? ' loading' : ''}`} disabled={loading || !notRobot}>
                 <span className="spinner"></span>
                 <span className="btn-text" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
