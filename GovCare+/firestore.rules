@@ -27,7 +27,7 @@ service cloud.firestore {
     match /complaints/{complaintId} {
       allow create: if isAuth() && request.resource.data.citizenId == request.auth.uid;
       allow get:    if isAuth() && (resource.data.citizenId == request.auth.uid || isAdmin());
-      allow list:   if isAdmin();
+      allow list:   if isAdmin() || (isAuth() && resource.data.citizenId == request.auth.uid);
       allow update: if isAdmin()
                     && request.resource.data.diff(resource.data)
                          .affectedKeys()
@@ -45,7 +45,7 @@ service cloud.firestore {
     match /activityLogs/{logId} {
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow get:    if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow list:   if isAdmin();
+      allow list:   if isAdmin() || (isAuth() && resource.data.userId == request.auth.uid);
       allow update, delete: if false;
     }
 
