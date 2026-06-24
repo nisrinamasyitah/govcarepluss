@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const translations = {
   en: {
@@ -589,7 +591,13 @@ export default function MainPage() {
   const [language, setLanguage] = useState('en');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setLoggedIn(!!u));
+    return unsub;
+  }, []);
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -717,8 +725,8 @@ export default function MainPage() {
           <p className="hero-description">{t.heroDescription}</p>
           <p className="hero-subtitle">{t.heroSubtitle}</p>
           <div className="hero-buttons">
-            <a href="/login" className="btn-primary">{t.submitComplaint}</a>
-            <a href="/login" className="btn-secondary">{t.trackStatus}</a>
+            <a href={loggedIn ? '/submit-complaint' : '/login'} className="btn-primary">{t.submitComplaint}</a>
+            <a href={loggedIn ? '/track-status' : '/login'} className="btn-secondary">{t.trackStatus}</a>
           </div>
         </div>
       </div>
@@ -888,8 +896,8 @@ export default function MainPage() {
               <h4>{t.quickLinks}</h4>
               <ul>
                 <li><a href="/">{t.navHome}</a></li>
-                <li><a href="/login">{t.submitComplaint}</a></li>
-                <li><a href="/login">{t.trackStatus}</a></li>
+                <li><a href={loggedIn ? '/submit-complaint' : '/login'}>{t.submitComplaint}</a></li>
+                <li><a href={loggedIn ? '/track-status' : '/login'}>{t.trackStatus}</a></li>
                 <li><a href="/faq">{t.faq}</a></li>
               </ul>
             </div>
