@@ -3,6 +3,17 @@ import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestor
 import { db } from '../firebase';
 import { encrypt, decrypt, safeDecrypt, isEncrypted, verifyIntegrity } from '../crypto';
 
+// Detects XSS, script injection, or SQL injection patterns in plaintext
+function isSuspicious(text) {
+  if (!text || text === '—') return false;
+  return (
+    /<[a-z][\s\S]*?>/i.test(text)   ||   // HTML tags
+    /javascript\s*:/i.test(text)    ||   // JS protocol
+    /on\w+\s*=/i.test(text)         ||   // event handlers (onerror=, onload=)
+    /\b(select|drop|insert|delete|union)\b\s+/i.test(text) // SQL keywords
+  );
+}
+
 const STYLE_ID = 'govcare-enc-report-css';
 
 const encReportCss = `
@@ -528,6 +539,17 @@ export default function EncryptionReportPage({ darkMode }) {
                     </div>
                     <div className="enc-field-stored no-enc">HMAC-SHA256 signature</div>
                   </div>
+                  {(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) && (
+                    <div className="enc-field-row" style={{background:'rgba(239,68,68,0.08)',borderRadius:8,padding:'10px 14px'}}>
+                      <div className="enc-field-name" style={{color:'#f87171'}}>⚠ Suspicious Content</div>
+                      <div className="enc-field-plain" style={{color:'#fca5a5',fontSize:12}}>
+                        Malicious patterns detected in plaintext (HTML tags / script injection / SQL keywords).
+                        This content was submitted by the user — HMAC integrity is unaffected.
+                        Consider reviewing and removing this complaint.
+                      </div>
+                      <div className="enc-field-stored no-enc" style={{color:'#f87171'}}>XSS / SQLi flag</div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

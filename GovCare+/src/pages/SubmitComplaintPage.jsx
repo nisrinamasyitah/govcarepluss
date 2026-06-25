@@ -74,6 +74,17 @@ function bertClassify(text) {
   return { ministry: sorted[0][0], confidence, allScores: Object.fromEntries(sorted) };
 }
 
+// ─── Input Sanitization ──────────────────────────────────────────────────────
+function sanitizeInput(text) {
+  return (text || '')
+    .replace(/<[^>]*>/g, '')            // strip all HTML tags
+    .replace(/javascript\s*:/gi, '')    // strip javascript: protocol
+    .replace(/on\w+\s*=\s*["']?/gi, '') // strip event handlers (onerror=, onload=, etc.)
+    .replace(/--/g, '')                  // strip SQL comment sequences
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // ─── Priority Determination Engine ───────────────────────────────────────────
 function determinePriority(title, description, ministry) {
   const text = `${title} ${description}`.toLowerCase();
@@ -436,9 +447,9 @@ export default function SubmitComplaintPage() {
       const nlpConfidence = nlpResult?.confidence ?? (category ? 90 : 50);
       const complaintId = await generateComplaintId(detectedMinistry);
 
-      const plainTitle       = title.trim();
-      const plainDescription = description.trim();
-      const plainCitizenName = user?.displayName || 'Citizen';
+      const plainTitle       = sanitizeInput(title);
+      const plainDescription = sanitizeInput(description);
+      const plainCitizenName = sanitizeInput(user?.displayName || 'Citizen');
       const plainCitizenEmail = user?.email || '';
       const priority = determinePriority(plainTitle, plainDescription, detectedMinistry);
       const submissionDate = new Date().toISOString().split('T')[0];
