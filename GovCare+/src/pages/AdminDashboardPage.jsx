@@ -1121,14 +1121,15 @@ export default function AdminDashboardPage() {
     return () => { clearTimeout(timer); events.forEach(e => window.removeEventListener(e, reset)); };
   }, [settingsData.sessionTimeout]);
 
-  // Load ALL registered users from Firebase Auth via Cloud Function
+  // Load users: try Cloud Function first, fall back to complaints-derived list
+  const [authUsersFailed, setAuthUsersFailed] = useState(false);
   useEffect(() => {
     setUmLoading(true);
     const fns = getFunctions();
     const listUsers = httpsCallable(fns, 'adminListUsers');
     listUsers()
       .then(r => { setAuthUsers(r.data); setUmLoading(false); })
-      .catch(() => setUmLoading(false));
+      .catch(() => { setAuthUsersFailed(true); setUmLoading(false); });
   }, []);
 
   async function handleUpdateStatus() {
@@ -2090,24 +2091,61 @@ export default function AdminDashboardPage() {
         complaintsByUid[c.citizenId].push(c);
       });
 
-      // Build user list from ALL Firebase Auth accounts
-      const allUsers = authUsers.map(u => {
-        const userComplaints = complaintsByUid[u.uid] || [];
-        const joinedRaw = u.createdAt ? new Date(u.createdAt) : null;
-        const joinedDate = joinedRaw
-          ? `${joinedRaw.getFullYear()}-${String(joinedRaw.getMonth()+1).padStart(2,'0')}-${String(joinedRaw.getDate()).padStart(2,'0')}`
-          : 'N/A';
-        return {
-          id:            u.uid,
-          name:          u.displayName || u.email.split('@')[0] || 'User',
-          email:         u.email || '—',
-          role:          u.role,
-          suspended:     u.disabled,
-          complaints:    userComplaints,
-          joinedDate,
-          isCurrentUser: u.uid === user?.uid,
+      // Build user list — from Cloud Function if available, else derive from complaints
+      let allUsers;
+      if (!authUsersFailed && authUsers.length > 0) {
+        // Full list from Firebase Auth (Blaze plan)
+        allUsers = authUsers.map(u => {
+          const userComplaints = complaintsByUid[u.uid] || [];
+          const joinedRaw = u.createdAt ? new Date(u.createdAt) : null;
+          const joinedDate = joinedRaw
+            ? `${joinedRaw.getFullYear()}-${String(joinedRaw.getMonth()+1).padStart(2,'0')}-${String(joinedRaw.getDate()).padStart(2,'0')}`
+            : 'N/A';
+          return {
+            id:            u.uid,
+            name:          u.displayName || u.email.split('@')[0] || 'User',
+            email:         u.email || '—',
+            role:          u.role,
+            suspended:     u.disabled,
+            complaints:    userComplaints,
+            joinedDate,
+            isCurrentUser: u.uid === user?.uid,
+          };
+        });
+      } else {
+        // Fallback — derive from complaints (Spark plan)
+        const citizenMap = {};
+        complaints.forEach(c => {
+          const key = c.citizenId || c.email;
+          if (!key || key === 'Unknown') return;
+          if (!citizenMap[key]) {
+            citizenMap[key] = {
+              id: c.citizenId || key,
+              name: c.citizen || 'Unknown',
+              email: c.email || '—',
+              role: 'citizen',
+              suspended: false,
+              complaints: [],
+              joinedDate: c.date || 'N/A',
+            };
+          }
+          citizenMap[key].complaints.push(c);
+          if (c.date && (!citizenMap[key].joinedDate || c.date < citizenMap[key].joinedDate))
+            citizenMap[key].joinedDate = c.date;
+        });
+        const adminUser = {
+          id: user?.uid || 'admin',
+          name: displayName,
+          email: user?.email || '—',
+          role: 'admin',
+          suspended: false,
+          complaints: [],
+          joinedDate: 'N/A',
+          isCurrentUser: true,
         };
-      }).sort((a, b) => {
+        allUsers = [adminUser, ...Object.values(citizenMap)];
+      }
+      allUsers.sort((a, b) => {
         if (a.isCurrentUser) return -1;
         if (b.isCurrentUser) return 1;
         if (a.role === 'admin' && b.role !== 'admin') return -1;
