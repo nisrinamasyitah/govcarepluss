@@ -241,3 +241,26 @@ exports.adminGetComplaints = onCall(async (req) => {
     };
   });
 });
+
+// ── 6. adminListUsers ─────────────────────────────────────────────────────────
+exports.adminListUsers = onCall(async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'Login required');
+  const adminSnap = await db.collection('admins').doc(req.auth.uid).get();
+  if (!adminSnap.exists) throw new HttpsError('permission-denied', 'Admins only');
+
+  const [listResult, adminSnaps] = await Promise.all([
+    admin.auth().listUsers(1000),
+    db.collection('admins').get(),
+  ]);
+
+  const adminUids = new Set(adminSnaps.docs.map(d => d.id));
+
+  return listResult.users.map(u => ({
+    uid:         u.uid,
+    email:       u.email       || '',
+    displayName: u.displayName || '',
+    disabled:    u.disabled,
+    createdAt:   u.metadata.creationTime || '',
+    role:        adminUids.has(u.uid) ? 'admin' : 'citizen',
+  }));
+});

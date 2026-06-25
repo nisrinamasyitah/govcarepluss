@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { collection, doc, getDocs, updateDoc, setDoc, deleteDoc, query, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth, db } from '../firebase';
 import { decryptFields, verifyIntegrity } from '../crypto';
 import AdminFAQSection from './AdminFAQSection';
@@ -967,6 +968,7 @@ export default function AdminDashboardPage() {
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [umSearch, setUmSearch] = useState('');
   const [umUsers, setUmUsers] = useState([]);
+  const [authUsers, setAuthUsers] = useState([]);
   const [umLoading, setUmLoading] = useState(false);
   const [umSelected, setUmSelected] = useState(null);
   const [umConfirm, setUmConfirm] = useState(null);
@@ -1119,18 +1121,14 @@ export default function AdminDashboardPage() {
     return () => { clearTimeout(timer); events.forEach(e => window.removeEventListener(e, reset)); };
   }, [settingsData.sessionTimeout]);
 
-  // Real-time listener for users collection (User Management page)
+  // Load ALL registered users from Firebase Auth via Cloud Function
   useEffect(() => {
     setUmLoading(true);
-    const q = query(collection(db, 'users'));
-    const unsub = onSnapshot(q, snap => {
-      const data = snap.docs
-        .map(d => ({ uid: d.id, ...d.data() }))
-        .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
-      setUmUsers(data);
-      setUmLoading(false);
-    }, () => setUmLoading(false));
-    return () => unsub();
+    const fns = getFunctions();
+    const listUsers = httpsCallable(fns, 'adminListUsers');
+    listUsers()
+      .then(r => { setAuthUsers(r.data); setUmLoading(false); })
+      .catch(() => setUmLoading(false));
   }, []);
 
   async function handleUpdateStatus() {
@@ -2084,39 +2082,38 @@ export default function AdminDashboardPage() {
     if (activeNav === 'user-management') {
       const avatarColors = ['#6366f1','#8b5cf6','#ec4899','#f97316','#10b981','#3b82f6','#06b6d4','#f59e0b'];
 
-      // Derive unique citizens from complaints (guaranteed to have data)
-      const citizenMap = {};
+      // Build complaint count map keyed by citizenId
+      const complaintsByUid = {};
       complaints.forEach(c => {
-        const key = c.email && c.email !== '—' ? c.email : c.citizen;
-        if (!key || key === 'Unknown') return;
-        if (!citizenMap[key]) {
-          citizenMap[key] = {
-            id: key,
-            name: c.citizen || 'Unknown',
-            email: c.email || '—',
-            role: 'citizen',
-            suspended: false,
-            complaints: [],
-            joinedDate: c.date || '',
-          };
-        }
-        citizenMap[key].complaints.push(c);
-        if (c.date && (!citizenMap[key].joinedDate || c.date < citizenMap[key].joinedDate))
-          citizenMap[key].joinedDate = c.date;
+        if (!c.citizenId) return;
+        if (!complaintsByUid[c.citizenId]) complaintsByUid[c.citizenId] = [];
+        complaintsByUid[c.citizenId].push(c);
       });
 
-      // Add current admin user at top
-      const adminUser = {
-        id: user?.email || 'admin',
-        name: displayName,
-        email: user?.email || '—',
-        role: 'admin',
-        suspended: false,
-        complaints: [],
-        joinedDate: '',
-        isCurrentUser: true,
-      };
-      const allUsers = [adminUser, ...Object.values(citizenMap).sort((a,b) => b.complaints.length - a.complaints.length)];
+      // Build user list from ALL Firebase Auth accounts
+      const allUsers = authUsers.map(u => {
+        const userComplaints = complaintsByUid[u.uid] || [];
+        const joinedRaw = u.createdAt ? new Date(u.createdAt) : null;
+        const joinedDate = joinedRaw
+          ? `${joinedRaw.getFullYear()}-${String(joinedRaw.getMonth()+1).padStart(2,'0')}-${String(joinedRaw.getDate()).padStart(2,'0')}`
+          : 'N/A';
+        return {
+          id:            u.uid,
+          name:          u.displayName || u.email.split('@')[0] || 'User',
+          email:         u.email || '—',
+          role:          u.role,
+          suspended:     u.disabled,
+          complaints:    userComplaints,
+          joinedDate,
+          isCurrentUser: u.uid === user?.uid,
+        };
+      }).sort((a, b) => {
+        if (a.isCurrentUser) return -1;
+        if (b.isCurrentUser) return 1;
+        if (a.role === 'admin' && b.role !== 'admin') return -1;
+        if (b.role === 'admin' && a.role !== 'admin') return 1;
+        return b.complaints.length - a.complaints.length;
+      });
 
       const umQ = umSearch.toLowerCase();
       const filteredUsers = umQ
@@ -2126,6 +2123,12 @@ export default function AdminDashboardPage() {
       const adminCount     = allUsers.filter(u => u.role === 'admin').length;
       const citizenCount   = allUsers.filter(u => u.role !== 'admin').length;
       const suspendedCount = allUsers.filter(u => u.suspended).length;
+
+      if (umLoading) return (
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:300,color:'#64748b',fontSize:15}}>
+          Loading users…
+        </div>
+      );
 
       return (
         <div className="um-page">
@@ -2191,7 +2194,7 @@ export default function AdminDashboardPage() {
                   <div className="um-cell">{u.email}</div>
                   <div>
                     <span className={`um-role-badge ${isAdmin?'admin':'citizen'}`}>
-                      {isAdmin ? '⚙ Admin' : '👤 Citizen'}
+                      {isAdmin ? '⚙ Admin' : ' Citizen'}
                     </span>
                   </div>
                   <div className="um-cell" style={{fontWeight:600,color:u.complaints.length>0?'#e2e8f0':'#475569'}}>
