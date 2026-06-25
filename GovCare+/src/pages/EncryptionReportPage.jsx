@@ -527,29 +527,22 @@ export default function EncryptionReportPage({ darkMode }) {
                       </div>
                     </div>
                   ))}
-                  <div className="enc-field-row">
-                    <div className="enc-field-name">Integrity</div>
+                  <div className="enc-field-row" style={(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? {background:'rgba(239,68,68,0.08)',borderRadius:8} : {}}>
+                    <div className="enc-field-name" style={(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? {color:'#f87171'} : {}}>Integrity</div>
                     <div className="enc-field-plain">
                       {!c.hasHmac
                         ? <span className="enc-na">n/a — submitted before HMAC was added</span>
-                        : c.integrity === true
-                          ? <span className="enc-ok">✓ Verified — no tampering detected</span>
-                          : <span className="enc-fail">⚠ Mismatch — data may have been altered</span>
+                        : (isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain))
+                          ? <span className="enc-fail">⚠ Verified — tampering detected (malicious content: HTML / script injection / SQL keywords found in submission)</span>
+                          : c.integrity === true
+                            ? <span className="enc-ok">✓ Verified — no tampering detected</span>
+                            : <span className="enc-fail">⚠ Mismatch — data may have been altered</span>
                       }
                     </div>
-                    <div className="enc-field-stored no-enc">HMAC-SHA256 signature</div>
-                  </div>
-                  {(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) && (
-                    <div className="enc-field-row" style={{background:'rgba(239,68,68,0.08)',borderRadius:8,padding:'10px 14px'}}>
-                      <div className="enc-field-name" style={{color:'#f87171'}}>⚠ Suspicious Content</div>
-                      <div className="enc-field-plain" style={{color:'#fca5a5',fontSize:12}}>
-                        Malicious patterns detected in plaintext (HTML tags / script injection / SQL keywords).
-                        This content was submitted by the user — HMAC integrity is unaffected.
-                        Consider reviewing and removing this complaint.
-                      </div>
-                      <div className="enc-field-stored no-enc" style={{color:'#f87171'}}>XSS / SQLi flag</div>
+                    <div className="enc-field-stored no-enc" style={(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? {color:'#f87171'} : {}}>
+                      {(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? 'XSS / SQLi flag' : 'HMAC-SHA256 signature'}
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>
