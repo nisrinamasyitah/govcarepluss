@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { encrypt, decrypt, safeDecrypt, isEncrypted, verifyIntegrity } from '../crypto';
 
@@ -294,13 +294,13 @@ export default function EncryptionReportPage({ darkMode }) {
   }
 
   useEffect(() => {
-    const qU = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(20));
+    const qU = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
     const unsubU = onSnapshot(qU, async snap => {
       setUsers(await Promise.all(snap.docs.map(processUser)));
       triggerFlash();
     }, () => setUsers([]));
 
-    const qC = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'), limit(20));
+    const qC = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'));
     const unsubC = onSnapshot(qC, async snap => {
       setComplaints(await Promise.all(snap.docs.map(processComplaint)));
       triggerFlash();
