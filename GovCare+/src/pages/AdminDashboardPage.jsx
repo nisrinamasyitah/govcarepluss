@@ -2662,7 +2662,7 @@ export default function AdminDashboardPage() {
                         <div className="st-row-sub">Jaccard score for duplicate grouping</div>
                       </div>
                       <div className="st-slider-wrap">
-                        <input type="range" className="st-slider" min={30} max={90} step={5}
+                        <input type="range" className="st-slider" min={30} max={100} step={5}
                           value={set.similarityThreshold||50} onChange={e=>upd('similarityThreshold',+e.target.value)}/>
                         <span className="st-slider-val">{set.similarityThreshold||50}%</span>
                       </div>
