@@ -1271,7 +1271,7 @@ export default function AdminDashboardPage() {
   if (dupEnabled) activeComplaints.forEach((c, i) => {
     activeComplaints.forEach((other, j) => {
       if (i >= j) return;
-      if (c.ministry === other.ministry && similarity(c.title || '', other.title || '') >= simThreshold) {
+      if (c.ministry === other.ministry && similarity(c.title || '', other.title || '') > simThreshold) {
         const cId = c.docId || c.id;
         const oId = other.docId || other.id;
         // Find if either is already in a group
