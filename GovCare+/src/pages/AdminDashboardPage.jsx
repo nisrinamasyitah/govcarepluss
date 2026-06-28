@@ -1002,7 +1002,7 @@ export default function AdminDashboardPage() {
   });
   const [settingsTab, setSettingsTab] = useState('general');
   const [settingsSaved, setSettingsSaved] = useState(false);
-  const [reportsPeriod, setReportsPeriod] = useState('30d');
+  const [reportsPeriod, setReportsPeriod] = useState('all');
   const [reportsTab, setReportsTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -2932,9 +2932,9 @@ export default function AdminDashboardPage() {
     if (activeNav === 'reports') {
       const today   = new Date(); today.setHours(23,59,59,999);
       const dayMs   = 86400000;
-      const days    = reportsPeriod === '7d' ? 7 : reportsPeriod === '30d' ? 30 : 90;
-      const cutoff  = new Date(today.getTime() - days * dayMs);
-      const inRange = c => { const d = new Date(c.date || 0); return d >= cutoff && d <= today; };
+      const days    = reportsPeriod === '7d' ? 7 : reportsPeriod === '30d' ? 30 : reportsPeriod === '90d' ? 90 : null;
+      const cutoff  = days ? new Date(today.getTime() - days * dayMs) : null;
+      const inRange = c => { if (!cutoff) return true; const d = new Date(c.date || c.createdAt || 0); return d >= cutoff && d <= today; };
 
       const periodComplaints = complaints.filter(inRange);
       const total      = periodComplaints.length;
@@ -3064,7 +3064,7 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
               <div className="rp-period-tabs">
-                {[['7d','7 Days'],['30d','30 Days'],['90d','90 Days']].map(([v,l])=>(
+                {[['7d','7 Days'],['30d','30 Days'],['90d','90 Days'],['all','All']].map(([v,l])=>(
                   <button key={v} className={`rp-period-btn${reportsPeriod===v?' active':''}`} onClick={()=>setReportsPeriod(v)}>{l}</button>
                 ))}
               </div>
@@ -3083,7 +3083,7 @@ export default function AdminDashboardPage() {
             {/* Summary KPIs */}
             <div className="rp-summary">
               {[
-                { num: total,       label: 'Total Received',    icon: '#3b82f6', iconBg: 'rgba(59,130,246,0.15)',  change: `${days}d period`, cls:'neutral',
+                { num: total,       label: 'Total Received',    icon: '#3b82f6', iconBg: 'rgba(59,130,246,0.15)',  change: days ? `${days}d period` : 'All time', cls:'neutral',
                   svg: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
                 { num: resolved,    label: 'Resolved',          icon: '#10b981', iconBg: 'rgba(16,185,129,0.15)',  change: `${resRate}% rate`, cls:'up',
                   svg: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
