@@ -967,6 +967,8 @@ export default function AdminDashboardPage() {
   const [citSearch, setCitSearch] = useState('');
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [umSearch, setUmSearch] = useState('');
+  const [umPage,   setUmPage]   = useState(1);
+  const UM_PER_PAGE = 10;
   const [umUsers, setUmUsers] = useState([]);
   const [authUsers, setAuthUsers] = useState([]);
   const [umLoading, setUmLoading] = useState(false);
@@ -2177,7 +2179,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="um-search-bar">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{color:'#475569',flexShrink:0}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input placeholder="Search name or email…" value={umSearch} onChange={e => setUmSearch(e.target.value)}/>
+              <input placeholder="Search name or email…" value={umSearch} onChange={e => { setUmSearch(e.target.value); setUmPage(1); }}/>
             </div>
           </div>
 
@@ -2215,47 +2217,83 @@ export default function AdminDashboardPage() {
             </div>
             {filteredUsers.length === 0 ? (
               <div className="um-empty">No users found.</div>
-            ) : filteredUsers.map((u, idx) => {
-              const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
-              const color = u.role === 'admin' ? '#7c3aed' : avatarColors[idx % avatarColors.length];
-              const isAdmin = u.role === 'admin';
-              const isSuspended = !!u.suspended;
-              return (
-                <div key={u.id} className="um-row">
-                  <div className="um-name-cell">
-                    <div className="um-avatar" style={{background:color}}>{initials}</div>
-                    <div style={{minWidth:0}}>
-                      <div className="um-name">{u.name} {u.isCurrentUser && <span style={{fontSize:10,background:'rgba(99,102,241,0.15)',color:'#a5b4fc',padding:'1px 6px',borderRadius:4,marginLeft:4}}>You</span>}</div>
-                      <div className="um-uid">{u.complaints.length} complaint{u.complaints.length!==1?'s':''} · Joined {u.joinedDate || 'N/A'}</div>
+            ) : (() => {
+              const umTotalPgs = Math.ceil(filteredUsers.length / UM_PER_PAGE);
+              const umSafe     = Math.min(umPage, umTotalPgs);
+              const umPaged    = filteredUsers.slice((umSafe - 1) * UM_PER_PAGE, umSafe * UM_PER_PAGE);
+              return umPaged.map((u, idx) => {
+                const globalIdx = (umSafe - 1) * UM_PER_PAGE + idx;
+                const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+                const color = u.role === 'admin' ? '#7c3aed' : avatarColors[globalIdx % avatarColors.length];
+                const isAdmin = u.role === 'admin';
+                const isSuspended = !!u.suspended;
+                return (
+                  <div key={u.id} className="um-row">
+                    <div className="um-name-cell">
+                      <div className="um-avatar" style={{background:color}}>{initials}</div>
+                      <div style={{minWidth:0}}>
+                        <div className="um-name">{u.name} {u.isCurrentUser && <span style={{fontSize:10,background:'rgba(99,102,241,0.15)',color:'#a5b4fc',padding:'1px 6px',borderRadius:4,marginLeft:4}}>You</span>}</div>
+                        <div className="um-uid">{u.complaints.length} complaint{u.complaints.length!==1?'s':''} · Joined {u.joinedDate || 'N/A'}</div>
+                      </div>
+                    </div>
+                    <div className="um-cell">{u.email}</div>
+                    <div>
+                      <span className={`um-role-badge ${isAdmin?'admin':'citizen'}`}>
+                        {isAdmin ? '⚙ Admin' : ' Citizen'}
+                      </span>
+                    </div>
+                    <div className="um-cell" style={{fontWeight:600,color:u.complaints.length>0?'#e2e8f0':'#475569'}}>
+                      {u.complaints.length}
+                    </div>
+                    <div>
+                      <span className={`um-status-badge ${isSuspended?'suspended':'active'}`}>
+                        <span style={{width:6,height:6,borderRadius:'50%',background:'currentColor',display:'inline-block'}}/>
+                        {isSuspended ? 'Suspended' : 'Active'}
+                      </span>
+                    </div>
+                    <div className="um-actions">
+                      <button className="um-btn view" onClick={()=>setUmSelected(u)}>View</button>
+                      {!u.isCurrentUser && (
+                        isSuspended
+                          ? <button className="um-btn restore" onClick={()=>setUmConfirm({u, action:'restore'})}>Restore</button>
+                          : <button className="um-btn suspend" onClick={()=>setUmConfirm({u, action:'suspend'})}>Suspend</button>
+                      )}
                     </div>
                   </div>
-                  <div className="um-cell">{u.email}</div>
-                  <div>
-                    <span className={`um-role-badge ${isAdmin?'admin':'citizen'}`}>
-                      {isAdmin ? '⚙ Admin' : ' Citizen'}
-                    </span>
-                  </div>
-                  <div className="um-cell" style={{fontWeight:600,color:u.complaints.length>0?'#e2e8f0':'#475569'}}>
-                    {u.complaints.length}
-                  </div>
-                  <div>
-                    <span className={`um-status-badge ${isSuspended?'suspended':'active'}`}>
-                      <span style={{width:6,height:6,borderRadius:'50%',background:'currentColor',display:'inline-block'}}/>
-                      {isSuspended ? 'Suspended' : 'Active'}
-                    </span>
-                  </div>
-                  <div className="um-actions">
-                    <button className="um-btn view" onClick={()=>setUmSelected(u)}>View</button>
-                    {!u.isCurrentUser && (
-                      isSuspended
-                        ? <button className="um-btn restore" onClick={()=>setUmConfirm({u, action:'restore'})}>Restore</button>
-                        : <button className="um-btn suspend" onClick={()=>setUmConfirm({u, action:'suspend'})}>Suspend</button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
+
+          {/* Pagination */}
+          {filteredUsers.length > UM_PER_PAGE && (() => {
+            const umTotalPgs = Math.ceil(filteredUsers.length / UM_PER_PAGE);
+            const umSafe     = Math.min(umPage, umTotalPgs);
+            const start      = (umSafe - 1) * UM_PER_PAGE + 1;
+            const end        = Math.min(umSafe * UM_PER_PAGE, filteredUsers.length);
+            return (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 4px',fontSize:13,color:'#64748b'}}>
+                <span>Showing {start}–{end} of {filteredUsers.length} users</span>
+                <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                  <button
+                    onClick={() => setUmPage(p => Math.max(1, p - 1))}
+                    disabled={umSafe === 1}
+                    style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:'transparent',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px',opacity:umSafe===1?0.4:1}}
+                  >← Prev</button>
+                  {Array.from({length: umTotalPgs}, (_,i) => i+1).map(n => (
+                    <button key={n} onClick={() => setUmPage(n)}
+                      style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:umSafe===n?'#B889C5':'transparent',color:umSafe===n?'#fff':'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px'}}
+                    >{n}</button>
+                  ))}
+                  <button
+                    onClick={() => setUmPage(p => Math.min(umTotalPgs, p + 1))}
+                    disabled={umSafe === umTotalPgs}
+                    style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:'transparent',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px',opacity:umSafe===umTotalPgs?0.4:1}}
+                  >Next →</button>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Detail Modal */}
           {umSelected && (() => {
