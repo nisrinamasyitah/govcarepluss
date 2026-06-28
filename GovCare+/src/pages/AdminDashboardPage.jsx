@@ -3435,8 +3435,8 @@ export default function AdminDashboardPage() {
                           <div className="notif-body">
                             <div className="notif-text">
                               {n.type === 'urgent'
-                                ? <><strong>🔴 High Priority:</strong> {n.title}</>
-                                : <><strong>📋 New Complaint:</strong> {n.title}</>
+                                ? <><strong>High Priority:</strong> {n.title}</>
+                                : <><strong>New Complaint:</strong> {n.title}</>
                               }
                             </div>
                             <div className="notif-meta">
