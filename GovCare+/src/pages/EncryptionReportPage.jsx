@@ -250,7 +250,7 @@ export default function EncryptionReportPage({ darkMode }) {
   const [tab, setTab]       = useState('all');
   const [search, setSearch] = useState('');
   const [cPage, setCPage]   = useState(1);
-  const COMP_PER_PAGE = 20;
+  const COMP_PER_PAGE = 10;
 
   const [customText, setCustomText]       = useState('');
   const [customResult, setCustomResult]   = useState(null);
