@@ -965,6 +965,8 @@ export default function AdminDashboardPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [chartPeriod, setChartPeriod] = useState('7d');
   const [citSearch, setCitSearch] = useState('');
+  const [citPage,   setCitPage]   = useState(1);
+  const CIT_PER_PAGE = 10;
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [umSearch, setUmSearch] = useState('');
   const [umPage,   setUmPage]   = useState(1);
@@ -1956,7 +1958,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="cit-search-bar">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{color:'#475569',flexShrink:0}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input placeholder="Search name or email…" value={citSearch} onChange={e => setCitSearch(e.target.value)}/>
+              <input placeholder="Search name or email…" value={citSearch} onChange={e => { setCitSearch(e.target.value); setCitPage(1); }}/>
             </div>
           </div>
 
@@ -1998,33 +2000,61 @@ export default function AdminDashboardPage() {
               <div className="cit-empty">
                 {citQ ? `No citizens matching "${citSearch}"` : 'No citizen data yet. Citizens will appear here once complaints are submitted.'}
               </div>
-            ) : citizens.map((cit, idx) => {
-              const initials = cit.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-              const active = cit.complaints.filter(x => !['Resolved','Rejected'].includes(x.status)).length;
-              const isActive = active > 0;
-              return (
-                <div key={idx} className="cit-row" onClick={() => setSelectedCitizen(cit)}>
-                  <div className="cit-name-cell">
-                    <div className="cit-avatar" style={{background: cit.color}}>{initials}</div>
-                    <div>
-                      <div className="cit-name">{cit.name}</div>
-                      <div className="cit-email">{cit.complaints.length} complaint{cit.complaints.length!==1?'s':''}</div>
+            ) : (() => {
+              const citTotalPgs = Math.ceil(citizens.length / CIT_PER_PAGE);
+              const citSafe     = Math.min(citPage, citTotalPgs);
+              const citPaged    = citizens.slice((citSafe - 1) * CIT_PER_PAGE, citSafe * CIT_PER_PAGE);
+              return citPaged.map((cit, idx) => {
+                const initials = cit.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+                const active = cit.complaints.filter(x => !['Resolved','Rejected'].includes(x.status)).length;
+                const isActive = active > 0;
+                return (
+                  <div key={idx} className="cit-row" onClick={() => setSelectedCitizen(cit)}>
+                    <div className="cit-name-cell">
+                      <div className="cit-avatar" style={{background: cit.color}}>{initials}</div>
+                      <div>
+                        <div className="cit-name">{cit.name}</div>
+                        <div className="cit-email">{cit.complaints.length} complaint{cit.complaints.length!==1?'s':''}</div>
+                      </div>
                     </div>
+                    <div className="cit-email" style={{display:'flex',alignItems:'center'}}>{cit.email}</div>
+                    <div className="cit-cell bold">{cit.complaints.length}</div>
+                    <div className="cit-cell bold" style={{color: active > 0 ? '#f59e0b' : '#64748b'}}>{active}</div>
+                    <div>
+                      <span className={`cit-status-badge ${isActive ? 'active' : 'inactive'}`}>
+                        <span style={{width:6,height:6,borderRadius:'50%',background:'currentColor',display:'inline-block'}}/>
+                        {isActive ? 'Active' : 'Resolved'}
+                      </span>
+                    </div>
+                    <div><button className="cit-view-btn" onClick={e=>{e.stopPropagation();setSelectedCitizen(cit);}}>View →</button></div>
                   </div>
-                  <div className="cit-email" style={{display:'flex',alignItems:'center'}}>{cit.email}</div>
-                  <div className="cit-cell bold">{cit.complaints.length}</div>
-                  <div className="cit-cell bold" style={{color: active > 0 ? '#f59e0b' : '#64748b'}}>{active}</div>
-                  <div>
-                    <span className={`cit-status-badge ${isActive ? 'active' : 'inactive'}`}>
-                      <span style={{width:6,height:6,borderRadius:'50%',background:'currentColor',display:'inline-block'}}/>
-                      {isActive ? 'Active' : 'Resolved'}
-                    </span>
-                  </div>
-                  <div><button className="cit-view-btn" onClick={e=>{e.stopPropagation();setSelectedCitizen(cit);}}>View →</button></div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
+
+          {/* Pagination */}
+          {citizens.length > CIT_PER_PAGE && (() => {
+            const citTotalPgs = Math.ceil(citizens.length / CIT_PER_PAGE);
+            const citSafe     = Math.min(citPage, citTotalPgs);
+            const start       = (citSafe - 1) * CIT_PER_PAGE + 1;
+            const end         = Math.min(citSafe * CIT_PER_PAGE, citizens.length);
+            return (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 4px',fontSize:13,color:'#64748b'}}>
+                <span>Showing {start}–{end} of {citizens.length} citizens</span>
+                <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                  <button onClick={() => setCitPage(p => Math.max(1, p - 1))} disabled={citSafe === 1}
+                    style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:'transparent',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px',opacity:citSafe===1?0.4:1}}>← Prev</button>
+                  {Array.from({length: citTotalPgs}, (_,i) => i+1).map(n => (
+                    <button key={n} onClick={() => setCitPage(n)}
+                      style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:citSafe===n?'#B889C5':'transparent',color:citSafe===n?'#fff':'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px'}}>{n}</button>
+                  ))}
+                  <button onClick={() => setCitPage(p => Math.min(citTotalPgs, p + 1))} disabled={citSafe === citTotalPgs}
+                    style={{minWidth:32,height:32,borderRadius:7,border:'1px solid #334155',background:'transparent',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'0 10px',opacity:citSafe===citTotalPgs?0.4:1}}>Next →</button>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Citizen detail modal */}
           {selectedCitizen && (() => {
