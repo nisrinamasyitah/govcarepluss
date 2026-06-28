@@ -166,6 +166,23 @@ const encReportCss = `
   .enc-fail { color: #ef4444; font-weight: 700; font-size: 13px; }
   .enc-na   { color: #475569; font-size: 12px; }
 
+  /* Pagination */
+  .enc-pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 4px; font-size: 13px; color: #64748b;
+  }
+  .admin-page.light .enc-pagination { color: #6b7280; }
+  .enc-page-btns { display: flex; gap: 6px; align-items: center; }
+  .enc-page-btn {
+    min-width: 32px; height: 32px; border-radius: 7px; border: 1px solid #334155;
+    background: transparent; color: #94a3b8; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; padding: 0 10px; transition: all 0.15s;
+  }
+  .admin-page.light .enc-page-btn { border-color: #e5e7eb; color: #374151; }
+  .enc-page-btn:hover:not(:disabled) { border-color: #B889C5; color: #B889C5; }
+  .enc-page-btn.active { background: #B889C5; border-color: #B889C5; color: #fff; }
+  .enc-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
   /* Empty / loading */
   .enc-empty {
     background: #1e293b; border: 1px solid #334155; border-radius: 10px;
@@ -232,6 +249,8 @@ export default function EncryptionReportPage({ darkMode }) {
 
   const [tab, setTab]       = useState('all');
   const [search, setSearch] = useState('');
+  const [cPage, setCPage]   = useState(1);
+  const COMP_PER_PAGE = 20;
 
   const [customText, setCustomText]       = useState('');
   const [customResult, setCustomResult]   = useState(null);
@@ -300,7 +319,7 @@ export default function EncryptionReportPage({ darkMode }) {
       triggerFlash();
     }, () => setUsers([]));
 
-    const qC = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'));
+    const qC = query(collection(db, 'complaints'), orderBy('createdAt', 'asc'));
     const unsubC = onSnapshot(qC, async snap => {
       setComplaints(await Promise.all(snap.docs.map(processComplaint)));
       triggerFlash();
@@ -317,6 +336,8 @@ export default function EncryptionReportPage({ darkMode }) {
     setCustomResult({ plain: customText.trim(), enc, dec });
     setCustomLoading(false);
   }
+
+  useEffect(() => { setCPage(1); }, [search, tab]);
 
   const q = search.trim().toLowerCase();
 
@@ -496,9 +517,18 @@ export default function EncryptionReportPage({ darkMode }) {
             <div className="enc-empty"><span className="enc-spinner"/>Loading complaints…</div>
           ) : filteredComplaints.length === 0 ? (
             <div className="enc-empty">{q ? `No complaints match "${search}"` : 'No complaints submitted yet.'}</div>
-          ) : (
+          ) : (() => {
+            const totalC   = filteredComplaints.length;
+            const totalPgs = Math.ceil(totalC / COMP_PER_PAGE);
+            const safePage = Math.min(cPage, totalPgs);
+            const paged    = filteredComplaints.slice((safePage - 1) * COMP_PER_PAGE, safePage * COMP_PER_PAGE);
+            const start    = (safePage - 1) * COMP_PER_PAGE + 1;
+            const end      = Math.min(safePage * COMP_PER_PAGE, totalC);
+            const pageNums = Array.from({ length: totalPgs }, (_, i) => i + 1);
+            return (
+            <>
             <div className="enc-records">
-              {filteredComplaints.map(c => (
+              {paged.map(c => (
                 <div className="enc-card" key={c.id}>
                   <div className="enc-card-hdr">
                     <span className="enc-card-meta">
@@ -546,7 +576,19 @@ export default function EncryptionReportPage({ darkMode }) {
                 </div>
               ))}
             </div>
-          )}
+            <div className="enc-pagination">
+              <span>Showing {start}–{end} of {totalC} complaints</span>
+              <div className="enc-page-btns">
+                <button className="enc-page-btn" onClick={() => setCPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>← Prev</button>
+                {pageNums.map(n => (
+                  <button key={n} className={`enc-page-btn${safePage === n ? ' active' : ''}`} onClick={() => setCPage(n)}>{n}</button>
+                ))}
+                <button className="enc-page-btn" onClick={() => setCPage(p => Math.min(totalPgs, p + 1))} disabled={safePage === totalPgs}>Next →</button>
+              </div>
+            </div>
+            </>
+          );
+          })()}
         </div>
       )}
 
