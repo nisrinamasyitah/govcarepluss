@@ -250,7 +250,8 @@ export default function EncryptionReportPage({ darkMode }) {
   const [tab, setTab]       = useState('all');
   const [search, setSearch] = useState('');
   const [cPage, setCPage]   = useState(1);
-  const COMP_PER_PAGE = 5;
+  const [uPage, setUPage]   = useState(1);
+  const PER_PAGE = 5;
 
   const [customText, setCustomText]       = useState('');
   const [customResult, setCustomResult]   = useState(null);
@@ -337,7 +338,7 @@ export default function EncryptionReportPage({ darkMode }) {
     setCustomLoading(false);
   }
 
-  useEffect(() => { setCPage(1); }, [search, tab]);
+  useEffect(() => { setCPage(1); setUPage(1); }, [search, tab]);
 
   const q = search.trim().toLowerCase();
 
@@ -459,9 +460,18 @@ export default function EncryptionReportPage({ darkMode }) {
             <div className="enc-empty"><span className="enc-spinner"/>Loading users…</div>
           ) : filteredUsers.length === 0 ? (
             <div className="enc-empty">{q ? `No users match "${search}"` : 'No users registered yet.'}</div>
-          ) : (
+          ) : (() => {
+            const totalU   = filteredUsers.length;
+            const totalPgs = Math.ceil(totalU / PER_PAGE);
+            const safePage = Math.min(uPage, totalPgs);
+            const paged    = filteredUsers.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+            const start    = (safePage - 1) * PER_PAGE + 1;
+            const end      = Math.min(safePage * PER_PAGE, totalU);
+            const pageNums = Array.from({ length: totalPgs }, (_, i) => i + 1);
+            return (
+            <>
             <div className="enc-records">
-              {filteredUsers.map(u => (
+              {paged.map(u => (
                 <div className="enc-card" key={u.id}>
                   <div className="enc-card-hdr">
                     <span className="enc-card-meta">
@@ -496,7 +506,19 @@ export default function EncryptionReportPage({ darkMode }) {
                 </div>
               ))}
             </div>
-          )}
+            <div className="enc-pagination">
+              <span>Showing {start}–{end} of {totalU} users</span>
+              <div className="enc-page-btns">
+                <button className="enc-page-btn" onClick={() => setUPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>← Prev</button>
+                {pageNums.map(n => (
+                  <button key={n} className={`enc-page-btn${safePage === n ? ' active' : ''}`} onClick={() => setUPage(n)}>{n}</button>
+                ))}
+                <button className="enc-page-btn" onClick={() => setUPage(p => Math.min(totalPgs, p + 1))} disabled={safePage === totalPgs}>Next →</button>
+              </div>
+            </div>
+            </>
+            );
+          })()}
         </div>
       )}
 
@@ -519,11 +541,11 @@ export default function EncryptionReportPage({ darkMode }) {
             <div className="enc-empty">{q ? `No complaints match "${search}"` : 'No complaints submitted yet.'}</div>
           ) : (() => {
             const totalC   = filteredComplaints.length;
-            const totalPgs = Math.ceil(totalC / COMP_PER_PAGE);
+            const totalPgs = Math.ceil(totalC / PER_PAGE);
             const safePage = Math.min(cPage, totalPgs);
-            const paged    = filteredComplaints.slice((safePage - 1) * COMP_PER_PAGE, safePage * COMP_PER_PAGE);
-            const start    = (safePage - 1) * COMP_PER_PAGE + 1;
-            const end      = Math.min(safePage * COMP_PER_PAGE, totalC);
+            const paged    = filteredComplaints.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+            const start    = (safePage - 1) * PER_PAGE + 1;
+            const end      = Math.min(safePage * PER_PAGE, totalC);
             const pageNums = Array.from({ length: totalPgs }, (_, i) => i + 1);
             return (
             <>
