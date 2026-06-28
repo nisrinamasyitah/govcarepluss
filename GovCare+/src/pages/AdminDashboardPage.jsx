@@ -2272,7 +2272,7 @@ export default function AdminDashboardPage() {
                         {isAdmin ? '⚙ Admin' : ' Citizen'}
                       </span>
                     </div>
-                    <div className="um-cell" style={{fontWeight:600,color:u.complaints.length>0?'#e2e8f0':'#475569'}}>
+                    <div className="um-cell" style={{fontWeight:600,color:u.complaints.length>0?(darkMode?'#e2e8f0':'#111827'):(darkMode?'#475569':'#9ca3af')}}>
                       {u.complaints.length}
                     </div>
                     <div>
