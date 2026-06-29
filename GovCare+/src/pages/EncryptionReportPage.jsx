@@ -3,14 +3,15 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { encrypt, decrypt, safeDecrypt, isEncrypted, verifyIntegrity } from '../crypto';
 
-// Detects XSS, script injection, or SQL injection patterns in plaintext
+// Detects XSS, script injection, SQL injection, or NoSQL injection patterns in plaintext
 function isSuspicious(text) {
   if (!text || text === '—') return false;
   return (
-    /<[a-z][\s\S]*?>/i.test(text)   ||   // HTML tags
-    /javascript\s*:/i.test(text)    ||   // JS protocol
-    /on\w+\s*=/i.test(text)         ||   // event handlers (onerror=, onload=)
-    /\b(select|drop|insert|delete|union)\b\s+/i.test(text) // SQL keywords
+    /<[a-z][\s\S]*?>/i.test(text)                          ||   // HTML tags
+    /javascript\s*:/i.test(text)                           ||   // JS protocol
+    /on\w+\s*=/i.test(text)                                ||   // event handlers (onerror=, onload=)
+    /\b(select|drop|insert|delete|union)\b\s+/i.test(text) ||   // SQL keywords
+    /\$\s*(gt|lt|gte|lte|ne|eq|in|nin|or|and|not|where|regex|exists)\b/i.test(text) // NoSQL operators
   );
 }
 
@@ -585,14 +586,14 @@ export default function EncryptionReportPage({ darkMode }) {
                       {!c.hasHmac
                         ? <span className="enc-na">n/a — submitted before HMAC was added</span>
                         : (isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain))
-                          ? <span className="enc-fail">⚠ Verified — tampering detected (malicious content: HTML / script injection / SQL keywords found in submission)</span>
+                          ? <span className="enc-fail">⚠ Verified — tampering detected (malicious content: HTML / script injection / SQL / NoSQL keywords found in submission)</span>
                           : c.integrity === true
                             ? <span className="enc-ok">✓ Verified — no tampering detected</span>
                             : <span className="enc-fail">⚠ Mismatch — data may have been altered</span>
                       }
                     </div>
                     <div className="enc-field-stored no-enc" style={(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? {color:'#f87171'} : {}}>
-                      {(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? 'XSS / SQLi flag' : 'HMAC-SHA256 signature'}
+                      {(isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain)) ? 'XSS / SQLi / NoSQLi flag' : 'HMAC-SHA256 signature'}
                     </div>
                   </div>
                 </div>
