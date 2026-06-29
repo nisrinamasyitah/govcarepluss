@@ -454,8 +454,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setSubmitError('');
     if (!termsChecked) { setSubmitError(t.acceptError); return; }
-    if (honeypot) return; // bot detected
-    if (Date.now() - loadTime < 2000) return; // submitted too fast
+    if (honeypot) { console.warn('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
+    if (Date.now() - loadTime < 2000) { console.warn('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     const { fullName, email, phone, icNumber, password, confirmPassword } = form;
     if (fullName.length < 3 || !email || !phone || icNumber.length !== 14 || password !== confirmPassword) {
       setSubmitError(t.fillError); return;
