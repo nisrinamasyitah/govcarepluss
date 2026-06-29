@@ -341,37 +341,49 @@ export default function EncryptionReportPage({ darkMode }) {
   }, []);
 
   function downloadCSV() {
-    const rows = [];
     const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const row = (a, b, c) => [esc(a), esc(b), esc(c)].join(',');
+    const rows = [];
 
     if (filteredUsers?.length) {
-      rows.push(['=== USERS ===']);
-      rows.push(['Full Name', 'Email', 'Phone', 'IC Number', 'Registered', 'Encrypted'].map(esc).join(','));
-      filteredUsers.forEach(u => rows.push([
-        u.fullName.plain, u.email.plain, u.phone.plain, u.icNumber.plain,
-        String(u.createdAt), isEncrypted(u.phone.raw) ? 'Yes' : 'No',
-      ].map(esc).join(',')));
-      rows.push([]);
-    }
-
-    if (filteredComplaints?.length) {
-      rows.push(['=== COMPLAINTS ===']);
-      rows.push(['Citizen Name', 'Citizen Email', 'Title', 'Description', 'Ministry', 'Status', 'Integrity', 'Suspicious Flag'].map(esc).join(','));
-      filteredComplaints.forEach(c => {
-        const suspicious = isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain);
-        const integrityLabel = !c.hasHmac ? 'n/a'
-          : suspicious ? 'Tampering detected (XSS/SQLi/NoSQLi)'
-          : c.integrity === true ? 'Verified — no tampering'
-          : 'HMAC Mismatch — data altered';
-        rows.push([
-          c.citizenName.plain, c.citizenEmail.plain, c.title.plain,
-          c.description.plain, c.ministry, c.status,
-          integrityLabel, suspicious ? 'XSS / SQLi / NoSQLi flag' : 'HMAC-SHA256 signature',
-        ].map(esc).join(','));
+      rows.push(row('=== USERS ===', '', ''));
+      rows.push(row('FIELD', 'PLAINTEXT (DECRYPTED)', 'STORED IN FIRESTORE'));
+      filteredUsers.forEach(u => {
+        rows.push(row(`--- ${u.fullName.plain} · ${u.email.plain}`, '', ''));
+        rows.push(row('Full Name',  u.fullName.plain, isEncrypted(u.fullName.raw) ? u.fullName.raw : '(not encrypted)'));
+        rows.push(row('Email',      u.email.plain,    isEncrypted(u.email.raw)    ? u.email.raw    : '(not encrypted)'));
+        rows.push(row('Phone',      u.phone.plain,    isEncrypted(u.phone.raw)    ? u.phone.raw    : '(not encrypted)'));
+        rows.push(row('IC Number',  u.icNumber.plain, isEncrypted(u.icNumber.raw) ? u.icNumber.raw : '(not encrypted)'));
+        rows.push(row('Registered', String(u.createdAt), 'plaintext — not PII'));
+        rows.push(row('', '', ''));
       });
     }
 
-    const csv = rows.map(r => Array.isArray(r) ? r.join('') : r).join('\n');
+    if (filteredComplaints?.length) {
+      rows.push(row('=== COMPLAINTS ===', '', ''));
+      rows.push(row('FIELD', 'PLAINTEXT (DECRYPTED)', 'STORED IN FIRESTORE'));
+      filteredComplaints.forEach(c => {
+        const suspicious = isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain);
+        const integrityLabel = !c.hasHmac
+          ? 'n/a — submitted before HMAC was added'
+          : suspicious
+            ? '⚠ Verified — tampering detected (malicious content: XSS / SQLi / NoSQLi)'
+            : c.integrity === true
+              ? '✓ Verified — no tampering detected'
+              : '⚠ Mismatch — data may have been altered';
+        const integrityStored = suspicious ? 'XSS / SQLi / NoSQLi flag' : 'HMAC-SHA256 signature';
+
+        rows.push(row(`--- ${c.citizenName.plain} · ${c.ministry} · ${c.status}`, '', ''));
+        rows.push(row('Citizen Name',  c.citizenName.plain,  isEncrypted(c.citizenName.raw)  ? c.citizenName.raw  : '(not encrypted)'));
+        rows.push(row('Citizen Email', c.citizenEmail.plain, isEncrypted(c.citizenEmail.raw) ? c.citizenEmail.raw : '(not encrypted)'));
+        rows.push(row('Title',         c.title.plain,        isEncrypted(c.title.raw)        ? c.title.raw        : '(not encrypted)'));
+        rows.push(row('Description',   c.description.plain,  isEncrypted(c.description.raw)  ? c.description.raw  : '(not encrypted)'));
+        rows.push(row('Integrity',     integrityLabel,       integrityStored));
+        rows.push(row('', '', ''));
+      });
+    }
+
+    const csv = '﻿' + rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
