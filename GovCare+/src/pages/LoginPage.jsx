@@ -397,8 +397,9 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(''); setSuccess(false);
-    if (honeypot) return; // bot detected
-    if (Date.now() - loadTime < 2000) return; // submitted too fast
+    const _hp = honeypot || (document.querySelector('[name=website]') || {}).value || '';
+    if (_hp) { alert('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
+    if (Date.now() - loadTime < 2000) { alert('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);

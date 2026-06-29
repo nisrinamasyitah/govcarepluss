@@ -453,9 +453,10 @@ export default function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitError('');
+    const _hp = honeypot || (document.querySelector('[name=website]') || {}).value || '';
+    if (_hp) { alert('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
+    if (Date.now() - loadTime < 2000) { alert('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     if (!termsChecked) { setSubmitError(t.acceptError); return; }
-    if (honeypot) { console.warn('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
-    if (Date.now() - loadTime < 2000) { console.warn('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     const { fullName, email, phone, icNumber, password, confirmPassword } = form;
     if (fullName.length < 3 || !email || !phone || icNumber.length !== 14 || password !== confirmPassword) {
       setSubmitError(t.fillError); return;
