@@ -88,6 +88,16 @@ const encReportCss = `
   .enc-search:focus { border-color: #B889C5; }
   .enc-search::placeholder { color: #475569; }
 
+  /* Download button */
+  .enc-dl-btn {
+    display: flex; align-items: center; gap: 7px;
+    background: linear-gradient(135deg, #B889C5, #9b6aae); color: white; border: none;
+    border-radius: 9px; padding: 9px 16px; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; font-family: inherit; transition: opacity 0.2s;
+  }
+  .enc-dl-btn:hover { opacity: 0.88; }
+  .enc-dl-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
   /* Section header */
   .enc-section-hdr {
     display: flex; align-items: center; gap: 10px;
@@ -330,6 +340,47 @@ export default function EncryptionReportPage({ darkMode }) {
     return () => { unsubU(); unsubC(); };
   }, []);
 
+  function downloadCSV() {
+    const rows = [];
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
+    if (filteredUsers?.length) {
+      rows.push(['=== USERS ===']);
+      rows.push(['Full Name', 'Email', 'Phone', 'IC Number', 'Registered', 'Encrypted'].map(esc).join(','));
+      filteredUsers.forEach(u => rows.push([
+        u.fullName.plain, u.email.plain, u.phone.plain, u.icNumber.plain,
+        String(u.createdAt), isEncrypted(u.phone.raw) ? 'Yes' : 'No',
+      ].map(esc).join(',')));
+      rows.push([]);
+    }
+
+    if (filteredComplaints?.length) {
+      rows.push(['=== COMPLAINTS ===']);
+      rows.push(['Citizen Name', 'Citizen Email', 'Title', 'Description', 'Ministry', 'Status', 'Integrity', 'Suspicious Flag'].map(esc).join(','));
+      filteredComplaints.forEach(c => {
+        const suspicious = isSuspicious(c.title?.plain) || isSuspicious(c.description?.plain);
+        const integrityLabel = !c.hasHmac ? 'n/a'
+          : suspicious ? 'Tampering detected (XSS/SQLi/NoSQLi)'
+          : c.integrity === true ? 'Verified — no tampering'
+          : 'HMAC Mismatch — data altered';
+        rows.push([
+          c.citizenName.plain, c.citizenEmail.plain, c.title.plain,
+          c.description.plain, c.ministry, c.status,
+          integrityLabel, suspicious ? 'XSS / SQLi / NoSQLi flag' : 'HMAC-SHA256 signature',
+        ].map(esc).join(','));
+      });
+    }
+
+    const csv = rows.map(r => Array.isArray(r) ? r.join('') : r).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `GovCarePlus_EncryptionReport_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleSandbox() {
     if (!customText.trim()) return;
     setCustomLoading(true);
@@ -442,6 +493,19 @@ export default function EncryptionReportPage({ darkMode }) {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
+
+        <button
+          className="enc-dl-btn"
+          onClick={downloadCSV}
+          disabled={!users || !complaints}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download CSV
+        </button>
       </div>
 
       {/* ── USERS ── */}
