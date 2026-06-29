@@ -373,7 +373,7 @@ export default function RegisterPage() {
   const [language, setLanguage] = useState('en');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [honeypot, setHoneypot] = useState('');
+  const honeypotRef = useRef(null);
   const [loadTime] = useState(Date.now());
   const [notRobot, setNotRobot] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
@@ -453,7 +453,7 @@ export default function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitError('');
-    const _hp = honeypot || (document.querySelector('[name=website]') || {}).value || '';
+    const _hp = (honeypotRef.current && honeypotRef.current.value) || '';
     if (_hp) { alert('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
     if (Date.now() - loadTime < 2000) { alert('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     if (!termsChecked) { setSubmitError(t.acceptError); return; }
@@ -675,7 +675,7 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+            <input ref={honeypotRef} type="text" name="website" style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <div className="captcha-wrapper" style={{flexDirection:'column',gap:'8px'}}>
               <div className="robot-check" onClick={handleRobotClick}>
                 <div className={`robot-check-box${notRobot ? ' checked' : ''}`}>

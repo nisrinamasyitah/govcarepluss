@@ -320,7 +320,7 @@ export default function LoginPage() {
   const [resetError, setResetError] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const dropdownRef = useRef(null);
-  const [honeypot, setHoneypot] = useState('');
+  const honeypotRef = useRef(null);
   const [loadTime] = useState(Date.now());
   const [notRobot, setNotRobot] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
@@ -397,7 +397,7 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(''); setSuccess(false);
-    const _hp = honeypot || (document.querySelector('[name=website]') || {}).value || '';
+    const _hp = (honeypotRef.current && honeypotRef.current.value) || '';
     if (_hp) { alert('[BOT BLOCKED] Honeypot field filled — automated signup rejected.'); return; }
     if (Date.now() - loadTime < 2000) { alert('[BOT BLOCKED] Form submitted too fast (< 2s) — time-gate rejected.'); return; }
     setLoading(true);
@@ -518,7 +518,7 @@ export default function LoginPage() {
               </div>
               <a href="#" className="forgot-password" onClick={e => { e.preventDefault(); openForgotPassword(); }}>{t.forgotPassword}</a>
             </div>
-            <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+            <input ref={honeypotRef} type="text" name="website" style={{display:'none'}} tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <div className="captcha-wrapper" style={{flexDirection:'column',gap:'8px'}}>
               <div className="robot-check" onClick={handleRobotClick}>
                 <div className={`robot-check-box${notRobot ? ' checked' : ''}`}>
