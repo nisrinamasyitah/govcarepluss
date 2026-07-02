@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { collection, doc, setDoc, query, orderBy, getDocs, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { encryptFields, signIntegrity } from '../crypto';
+import { bertClassify } from '../nlp';
 
 // ─── Ministry Config ────────────────────────────────────────────────────────
 const MINISTRIES_CONFIG = {
@@ -14,65 +15,6 @@ const MINISTRIES_CONFIG = {
   'Home Affairs':             { prefix: 'HA', label: 'Ministry of Home Affairs',              color: '#8b5cf6' },
   'Environment & Cleanliness':{ prefix: 'EC', label: 'Ministry of Environment & Cleanliness',  color: '#06b6d4' },
 };
-
-// ─── BERT-style Keyword Sets ─────────────────────────────────────────────────
-const BERT_KEYWORDS = {
-  'Health': {
-    high:   ['hospital','clinic','doctor','nurse','medical','health','medicine','treatment','patient','disease','sick','covid','dengue','vaccination','ambulance','pharmacy','surgery','specialist','icu','ward','injection','prescription','mental health','klinik','ubat','doktor','sakit','penyakit'],
-    medium: ['waiting','care','appointment','fever','pain','injury','blood','scan','checkup','insurance','hygiene','sanitation','diet','nutrition','emergency'],
-    low:    ['slow','queue','crowded','dirty','poor','weak'],
-  },
-  'Transport': {
-    high:   ['bus','train','lrt','mrt','monorail','taxi','grab','flight','airport','highway','toll','traffic','road accident','vehicle','commute','public transport','expressway','congestion','parking','ktm','ets','rapid','bas','tren','lebuhraya','kesesakan'],
-    medium: ['route','schedule','driver','fare','ticket','station','stop','delay','cancel','late','unsafe','signage','signal'],
-    low:    ['slow','crowded','broken','rude'],
-  },
-  'Education': {
-    high:   ['school','university','college','teacher','student','education','exam','curriculum','tuition','scholarship','spm','upsr','stpm','diploma','degree','lecturer','principal','headmaster','sekolah','guru','pelajar','universiti','peperiksaan'],
-    medium: ['learning','study','subject','textbook','fees','grade','facilities','library','canteen','bully','harassment','uniform','registration','dropout'],
-    low:    ['unfair','poor','problem','complaint'],
-  },
-  'Works & Infrastructure': {
-    high:   ['pothole','road','bridge','drainage','flood','construction','building','infrastructure','streetlight','lamp post','water supply','pipe','sewage','pavement','sidewalk','jalan','longkang','banjir','lampu','bangunan','tiang','saliran','lubang'],
-    medium: ['repair','maintenance','damage','broken','leak','crack','collapse','blocked','fallen','hazard','electrical','wiring','sinkhole'],
-    low:    ['slow','old','unsafe','dull'],
-  },
-  'Home Affairs': {
-    high:   ['police','crime','robbery','theft','assault','murder','safety','security','immigration','passport','visa','mykad','ic','citizenship','drug','illegal','gangster','arrest','prison','bomba','fire','rompak','curi','polis','jenayah','dadah','keselamatan'],
-    medium: ['noise','neighbour','harassment','threat','suspicious','enforcement','permit','license','domestic','violence','vandalism'],
-    low:    ['unsafe','dangerous','fear','worry'],
-  },
-  'Environment & Cleanliness': {
-    high:   ['rubbish','garbage','waste','litter','pollution','environment','river','air quality','smoke','illegal dumping','recycle','cleanliness','dirty','smell','odor','chemical','toxic','mosquito','rat','pest','sampah','sungai','pencemaran','bau','tikus','nyamuk','pembuangan haram'],
-    medium: ['clean','filthy','contamination','stray','animal','tree','park','grass','overgrown','clearing','haze','jerebu'],
-    low:    ['bad','ugly','poor','old'],
-  },
-};
-
-// ─── BERT NLP Classifier ─────────────────────────────────────────────────────
-function bertClassify(text) {
-  if (!text || text.trim().length < 10) return null;
-  const lower = text.toLowerCase();
-
-  const rawScores = {};
-  for (const [ministry, kws] of Object.entries(BERT_KEYWORDS)) {
-    let score = 0;
-    kws.high.forEach(kw   => { if (lower.includes(kw)) score += 3.0; });
-    kws.medium.forEach(kw => { if (lower.includes(kw)) score += 1.5; });
-    kws.low.forEach(kw    => { if (lower.includes(kw)) score += 0.5; });
-    rawScores[ministry] = score;
-  }
-
-  const total = Object.values(rawScores).reduce((a, b) => a + b, 0);
-  if (total === 0) return null;
-
-  const sorted = Object.entries(rawScores).sort((a, b) => b[1] - a[1]);
-  const topScore = sorted[0][1];
-  // Softmax-inspired confidence capped at 97%
-  const confidence = Math.min(Math.round((topScore / total) * 150), 97);
-
-  return { ministry: sorted[0][0], confidence, allScores: Object.fromEntries(sorted) };
-}
 
 // ─── Input Sanitization ──────────────────────────────────────────────────────
 function sanitizeInput(text) {
@@ -373,17 +315,21 @@ export default function SubmitComplaintPage() {
   function toggleDark() { const n = !darkMode; setDarkMode(n); localStorage.setItem('govcare-theme', n ? 'dark' : 'light'); }
   function changeLang(lang) { setLanguage(lang); setLangOpen(false); localStorage.setItem('govcare-language', lang); }
 
-  // Real-time NLP classification as user types
+  // Real-time NLP classification as user types (async BERT)
   useEffect(() => {
     const text = (title + ' ' + description).trim();
     if (text.length < 20) { setNlpResult(null); setNlpAnalyzing(false); return; }
     setNlpAnalyzing(true);
-    const timer = setTimeout(() => {
-      const result = bertClassify(text);
-      setNlpResult(result);
-      setNlpAnalyzing(false);
-    }, 600); // 600ms debounce — mimics API call
-    return () => clearTimeout(timer);
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const result = await bertClassify(text);
+        if (!cancelled) { setNlpResult(result); setNlpAnalyzing(false); }
+      } catch {
+        if (!cancelled) setNlpAnalyzing(false);
+      }
+    }, 600);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [title, description]);
 
   function handleFiles(newFiles) {
